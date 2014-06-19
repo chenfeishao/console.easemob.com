@@ -337,36 +337,9 @@ function formSubmit(){
 				$('#signup-box').removeClass('visible');
 				$('#login-box').addClass('visible');
 				$('#username').val(regUserName);
-				// 给sandbox app 创建两个app user
-				alert(JSON.stringify({username:'testUser1',password:'123456'}))
-				$.ajax({
-						url:baseUrl + '/' + regOrgName + '/sandbox/users',
-						type:'POST',
-						data:JSON.stringify({username:'testUser1',password:'123456'}),
-						headers:{
-							'Content-Type':'application/json'
-						},
-						success:function(respData){
-						},
-						error:function(data){
-						}
-				});	
-				alert(JSON.stringify({username:'testUser2',password:'123456'}))
-				$.ajax({
-						url:baseUrl + '/' + regOrgName + '/sandbox/users',
-						type:'POST',
-						data:JSON.stringify({username:'testUser2',password:'123456'}),
-						headers:{
-							'Content-Type':'application/json'
-						},
-						success:function(respData){
-						},
-						error:function(data){
-						}
-				});
-				
+			
 				// 告知发送邮件
-				//window.location.href = 'regist_org_success.html?mailSuffix='+mailSuffix+'&regEmail='+regEmail;
+				window.location.href = 'regist_org_success.html?mailSuffix='+mailSuffix+'&regEmail='+regEmail;
 			},
 			error: function(respData, textStatus, jqXHR) {
 				var str = JSON.stringify(respData.responseText).replace('}','').replace('{','').split(',');
@@ -1061,7 +1034,7 @@ function getAppProfile(appUuid){
 					var modified = format(this.modified);
 					var applicationName = this.applicationName;
 					var organizationName = this.organizationName;
-					var allowOpen = this.allow_open_registration?'自由注册':'仅管理员可注册';
+					var allowOpen = this.allow_open_registration?'开放注册':'授权注册';
 					var tag = this.allow_open_registration?'0':'1';
 					$('#appKey').text(organizationName+'#'+applicationName);
 					$('#xmlandroidAppkey').text(organizationName+'#'+applicationName);
@@ -1123,7 +1096,7 @@ function getAppProfileforAppAdmin(appUuid){
 	}
 }
 
-// 切换app授权状态
+// 切换app注册模式
 function changeAllowOpen(){
 	var access_token = $.cookie('access_token');
 	var orgName = $.cookie('orgName');
@@ -1149,20 +1122,20 @@ function changeAllowOpen(){
 			'Content-Type':'application/json'
 		},
 		success:function(respData){
-			alert('提示!\n\状态切换成功!');
+			alert('提示!\n\模式切换成功!');
 			//toApppofile();
 			$(respData.entities).each(function(){
 				var tag = this.allow_open_registration?'0':'1';
 				$('#allowOpenHdd').val(tag);
 				if(this.allow_open_registration){
-					$('#allowOpen').text('自由注册');	
+					$('#allowOpen').text('开放注册');	
 				}else {
-					$('#allowOpen').text('仅管理员可注册');
+					$('#allowOpen').text('授权注册');
 				}
 			});
 		},
 		error:function(data){
-			alert('提示!\n\状态切换失败!');
+			alert('提示!\n\模式切换失败!');
 		}
 	});
 	
