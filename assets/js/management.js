@@ -201,7 +201,7 @@ function resetPasswdReq(token,uuid){
 			},
 			success:function(respData){
 				alert('提示!\n\重置密码成功!');
-				window.location.href = 'http://console.easemob.com';
+				window.location.href = 'https://console.easemob.com';
 			},
 			error:function(data){
 				alert('提示!\n\重置密码失败!');
