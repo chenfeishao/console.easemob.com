@@ -1543,49 +1543,7 @@ function deleteAppChatroom(appUuid,groupuuid){
 
 //============================================================证书 ========================================================================
 // 上传证书
-function uploadAppCredential(){
-	var access_token = $.cookie('access_token');
-	var orgName = $.cookie('orgName');
-	var d = {
-		'devSec':base64encode($('#devSec').val()),
-		'proSec':base64encode($('#proSec').val())
-	};
-	// 保存密码
-	$.ajax({
-		url:baseUrl + '/management/organizations/'+orgName+'/applications/'+appUuid,
-		type:'PUT',
-		headers:{
-			'Authorization':'Bearer ' + access_token,
-			'Content-Type':'multipart/form-data'
-		},
-		data:JSON.stringify(d),
-		error:function(){
-			alert('提示\n\n删除失败!');
-		},
-		success:function(respData){
-			alert('提示\n\n删除成功!');
-		}
-	});
-	
-	// 保存文件
-	$.ajax({
-		url:baseUrl + '/qixin/sandbox/appCredential',
-		type:'POST',
-		headers:{
-			'Authorization':'Bearer ' + access_token,
-			'Content-Type':'multipart/form-data'
-		},
-		data:{
-			
-		},
-		error:function(){
-			alert('提示\n\n上传失败!');
-		},
-		success:function(respData){
-			alert('提示\n\n上传成功!');
-		}
-	});
-}
+
 
 
 // 查询证书信息
@@ -1593,7 +1551,7 @@ function getAppCredentials(appUuid){
 	var access_token = $.cookie('access_token');
 	var orgName = $.cookie('orgName');
 	$.ajax({
-			url:baseUrl+'/'+ orgName +'/' + appUuid + '/appCredential',
+			url:baseUrl+'/'+ orgName +'/' + appUuid + '/notifiers',
 			type:'GET',
 			headers:{
 				'Authorization':'Bearer '+access_token,
@@ -1603,24 +1561,28 @@ function getAppCredentials(appUuid){
 				alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success: function(respData, textStatus, jqXHR) {
+				$('#appCredentialBody').html('');
+				
 				$(respData.entities).each(function(){
-					var uuid = this.uuid;
-					var devSec = this.devSec;
-					var creType = '';
-					if(this.creType == 'dev') {
-						creType = '开发';
-					} else if(this.creType == 'product'){
-						creType = '生产';
+					var name = this.name;
+					var credentialId = this.uuid;
+					var passphrase = this.passphrase;
+					var environment = '';
+					if(this.environment == 'DEVELOPMENT') {
+						environment = '开发';
+					} else if(this.environment == 'PRODUCTION'){
+						environment = '生产';
 					}
 					
 					var created = format(this.created);
 					var modified = format(this.modified);
 					var option = '<tr>'+
-							'<td>'+uuid+'</td>'+
-						 	'<td>'+creType+'</td>'+
-						 	'<td>'+devSec+'</td>'+
-					   	'<td>'+created+'</td>'+
-					   	'<td>'+modified+'</td>'+
+							'<td class="text-center">'+name+'</td>'+
+						 	'<td class="text-center">'+environment+'</td>'+
+						 	'<td class="text-center">'+passphrase+'</td>'+
+					   	'<td class="text-center">'+created+'</td>'+
+					   	'<td class="text-center">'+modified+'</td>'+
+					   	'<td class="text-center"><a href="javascript:deleteAppCredential(\''+ credentialId + '\',\''+ appUuid +'\')"><i class="icon-trash bigger-120"></i></a></td>'+
 				 		'</tr>';
 						$('#appCredentialBody').append(option);
 				});
@@ -1629,10 +1591,36 @@ function getAppCredentials(appUuid){
 				$('#fileAppKey').text(respData.applicationName);
 				
 				if(respData.entities.length == 0){
-					var option = '<tr><td class="text-center" colspan="5">暂无证书!</td></tr>';
+					var option = '<tr><td class="text-center" colspan="6">暂无证书!</td></tr>';
 					$('#appCredentialBody').append(option);
 				}
 			}
 		});
+}
+
+// 删除开发者推送证书
+function deleteAppCredential(credentialId,appUuid){
+	var access_token = $.cookie('access_token');
+	var orgName = $.cookie('orgName');
+	
+	if(confirm('确定删除这个证书吗?')){
+		$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid + '/notifiers/' + credentialId,
+			type:'DELETE',
+			headers:{
+				'Authorization':'Bearer ' + access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			},
+			success: function(respData, textStatus, jqXHR) {
+				alert(respData.error)
+				if(!respData.error) {
+						alert('证书已删除!')	
+						getAppCredentials(appUuid);
+					}
+			}
+		});	
+	}
 }
 //=====================================================================================================================================
