@@ -920,6 +920,7 @@ function getAppList(){
 		$.ajax({
 			url:baseUrl+'/management/organizations/'+ orgName +'/applications',
 			type:'GET',
+			crossDomain:true,
 			headers:{
 				'Authorization':'Bearer '+access_token,
 				'Content-Type':'application/json'
@@ -1582,7 +1583,7 @@ function getAppCredentials(appUuid){
 						 	'<td class="text-center">'+passphrase+'</td>'+
 					   	'<td class="text-center">'+created+'</td>'+
 					   	'<td class="text-center">'+modified+'</td>'+
-					   	'<td class="text-center"><a href="javascript:deleteAppCredential(\''+ credentialId + '\',\''+ appUuid +'\')"><i class="icon-trash bigger-120"></i></a></td>'+
+					   	'<td class="text-center"><a href="javascript:deleteAppCredential(\''+ credentialId + '\',\''+ appUuid +'\')">删除</a></td>'+
 				 		'</tr>';
 						$('#appCredentialBody').append(option);
 				});
@@ -1614,11 +1615,8 @@ function deleteAppCredential(credentialId,appUuid){
 			error: function(jqXHR, textStatus, errorThrown) {
 			},
 			success: function(respData, textStatus, jqXHR) {
-				alert(respData.error)
-				if(!respData.error) {
-						alert('证书已删除!')	
-						getAppCredentials(appUuid);
-					}
+					alert('证书已删除!')	
+					getAppCredentials(appUuid);
 			}
 		});	
 	}
