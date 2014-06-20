@@ -1580,7 +1580,6 @@ function getAppCredentials(appUuid){
 					var option = '<tr>'+
 							'<td class="text-center">'+name+'</td>'+
 						 	'<td class="text-center">'+environment+'</td>'+
-						 	'<td class="text-center">'+passphrase+'</td>'+
 					   	'<td class="text-center">'+created+'</td>'+
 					   	'<td class="text-center">'+modified+'</td>'+
 					   	'<td class="text-center"><a href="javascript:deleteAppCredential(\''+ credentialId + '\',\''+ appUuid +'\')">删除</a></td>'+
