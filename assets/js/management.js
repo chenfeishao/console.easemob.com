@@ -739,6 +739,7 @@ function toAppList(){
 function createAppFormValidate(){
 	// 表单校验
 	var appName = $('#appName').val();
+	var nick = $('#nick').val();
 	//var appDesc = $('#appDesc').val();
 	if('' == appName){
 		$('#appNameMsg').text('应用名不能为空！');
@@ -755,7 +756,17 @@ function createAppFormValidate(){
  	}
  	$('#appNameMsg').text('输入正确！');
 	$('#appNameMsg').css('color','blue');
-		
+ 	
+ 	var nickRegex = /^[0-9a-zA-Z-_]*$/;
+ 	if(!nickRegex.test(nick)){
+		$('#nickMsg').text('产品名称只能是汉字,字母,数字、横线、下划线及其组合!');
+		$('#nickMsg').css('color','red');
+ 		$('#nick').focus();
+		return false;
+ 	}
+ 	$('#nickMsg').text('输入正确！');
+	$('#nickMsg').css('color','blue');
+ 
  	//var appDescReg = /^[0-9a-zA-Z]{1,100}$/;
 	//if(!appDescReg.test(appDesc)){
 		//$('#appDescMsg').css('color','red');
@@ -1298,10 +1309,6 @@ function getAppUserList(appUuid,pageAction){
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert(JSON.stringify(jqXHR));
-				alert(JSON.stringify(textStatus));
-				alert(JSON.stringify(errorThrown));
-				alert('1111111111111111111111111111111111111!');
 			},
 			success: function(respData, textStatus, jqXHR) {
 				// 缓存游标
