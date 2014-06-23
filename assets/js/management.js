@@ -146,12 +146,27 @@ function resetPasswd(){
 				// 告知发送邮件
 				if(respData.status && respData.status == 'ok') {
 					alert('提示!\n\n邮件已发送,请前往邮箱继续找回密码.');
-				} else if(respData.error && respData.error == 'management') {
-					alert('提示!\n\n该邮箱未注册过环信!');
 				}
 			},
-			error:function(data){
-				alert('提示\n\n找回密码出错! 请联系系统管理员!');
+			error:function(respData){
+				var str = JSON.stringify(respData.responseText).replace('}','').replace('{','').split(',');
+				var tmpArr = new Array();
+				var errorMsg = '';
+				for(var i = 0; i < str.length; i++) {
+					tmpArr.push(str[i].replace(/\\/g,'').replace(/\"/g,'').split(':'));
+				}
+				for(var i = 0; i < tmpArr.length; i++) {
+					if('error_description' == tmpArr[i][0]){
+						if(tmpArr[i][1].indexOf("Could not find organization for email") > -1) {
+							errorMsg = '该邮箱未注册过环信!';
+						}
+						if(tmpArr[i][1].indexOf("username") > -1) {
+							errorMsg = '请联系系统管理员 !';
+						}
+					}
+				}
+				
+				alert('提示\n\n' + errorMsg);
 			}
 		});
 	}
