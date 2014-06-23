@@ -1078,7 +1078,7 @@ function getAppProfile(appUuid){
 		// 获取app credential
 		//http://a1.easemob.com:80/management/organizations/belo/applications/myapptest/credentials
 		$.ajax({
-			url: baseUrl + '/management/organizations/' + orgName + '/applications/' + appUuid + '/credentials',
+			url: baseUrl + '/' + orgName + '/' + appUuid + '/credentials',
 			type:'GET',
 			headers:{
 				'Authorization':'Bearer ' + access_token,
