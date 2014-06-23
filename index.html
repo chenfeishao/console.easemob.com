@@ -179,11 +179,12 @@ function getBrowser() {
 		
 		var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
 		if(regEmail != '' && !emailReg.test(regEmail)){
+			$('#regEmailSEMsg').css('display','none');
 			$('#regEmailEMsg').text('请输入有效的邮箱！');
 			//$('#regEmail').focus();
 			return;
 		}
-			
+		
 	 	$('#regEmailEMsg').text('');	
 	}
 	
@@ -372,6 +373,7 @@ function getBrowser() {
                         <label> <span class="block input-icon input-icon-right">
                           <input type="text" id="regEmail" placeholder="电子邮件" class="span12" name="regEmail" value="" onblur="onBlurRegEmailCheck()">
                           <i class="icon-envelope"></i></span>
+                          <span id="regEmailSEMsg" style="font-size:12px;">为了能及时收到激活邮件，建议使用QQ邮箱之外的邮箱</span>
                           <span id="regEmailEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label> <span class="block input-icon input-icon-right">
