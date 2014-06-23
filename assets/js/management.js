@@ -740,7 +740,8 @@ function createAppFormValidate(){
 	// 表单校验
 	var appName = $('#appName').val();
 	var nick = $('#nick').val();
-	//var appDesc = $('#appDesc').val();
+	var appDesc = $('#appDesc').val();
+	
 	if('' == appName){
 		$('#appNameMsg').text('应用名不能为空！');
 		$('#appNameMsg').css('color','red');
@@ -767,12 +768,14 @@ function createAppFormValidate(){
  	$('#nickMsg').text('输入正确！');
 	$('#nickMsg').css('color','blue');
  
- 	//var appDescReg = /^[0-9a-zA-Z]{1,100}$/;
-	//if(!appDescReg.test(appDesc)){
-		//$('#appDescMsg').css('color','red');
-		//$('#appDesc').focus();
-		//return false;
-	//}
+ 	var appDescReg = /^[0-9a-zA-Z]{0,100}$/;
+	if(!appDescReg.test(appDesc)){
+		$('#appDescMsg').css('color','red');
+		$('#appDesc').focus();
+		return false;
+	}
+	$('#appDescMsg').text('输入正确！');
+	$('#appDescMsg').css('color','blue');
  	
 	return true;
 }
@@ -785,12 +788,12 @@ function saveNewApp(){
 	var orgName = $.cookie('orgName');
 	var appname = $('#appName').val();
 	var allow_open_registration = $('input[name="allow_open_registration"]:checked').val();
-	//var appDesc = $('#appDesc').val();
+	var appDesc = $('#appDesc').val();
 	
 	var dataBody = {
 		'name':appname,
-		'allow_open_registration':allow_open_registration
-		//'appDesc':appDesc
+		'allow_open_registration':allow_open_registration,
+		'appDesc':appDesc
 	};
 	
 	if(!access_token || access_token==''){
