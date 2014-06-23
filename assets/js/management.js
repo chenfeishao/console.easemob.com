@@ -218,6 +218,7 @@ function regsFormValidate(){
 	var regEmail = $('#regEmail').val();
 	var regPassword = $('#regPassword').val();
 	var regRePassword = $('#regRePassword').val();
+	var regTell = $('#regTell').val();
 	
 	if('' == regOrgName){
 		$('#regOrgNameSMsg').css('display','none');
@@ -289,11 +290,20 @@ function regsFormValidate(){
 		return false;
 	}
 
+	var regTellReg = /^[0-9]*$/;
+	if(regTell != '' && !regTellReg.test(regTell)){
+		$('#regTellEMsg').text('联系电话号码格式不符合要求！');
+		//$('#regEmail').focus();
+		return false;
+	}
+		
 	$('#regOrgNameEMsg').text('');
 	$('#regUserNameEMsg').text('');	
 	$('#regPasswordEMsg').text('');
 	$('#regRePasswordEMsg').text('');	
 	$('#regEmailEMsg').text('');
+	$('#regTellEMsg').text('');
+	
 	return true;
 }
 	

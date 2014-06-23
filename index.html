@@ -40,7 +40,7 @@
 }
 </style>
 
-<script>
+<script type="text/javascript">
 	$(function(){
 		//读取cookie
 		if($('#rememberme:checked').length>0){
@@ -50,6 +50,10 @@
 		
 		$('#username').focus();
 		
+		var QSTR = '';
+		if(QSTR == ''){
+			
+		}
 		//$('select[name="loginRole"]>option:eq(0)').attr('selected',true);
 		//changeLabel();
 	});
@@ -181,6 +185,21 @@ function getBrowser() {
 	 	$('#regEmailEMsg').text('');	
 	}
 	
+	function onBlurRegTelCheck(){
+		$('#regTel').val($('#regTel').val().trim());
+		var regTel = $('#regTel').val();
+		
+		var regTelReg = /^[0-9]*$/;
+		if(regTel != '' && !regTelReg.test(regTel)){
+			$('#regTelSEMsg').css('display','none');
+			$('#regTelEMsg').text('联系电话号码格式不符合要求！');
+			//$('#regEmail').focus();
+			return;
+		}
+			
+	 	$('#regTellEMsg').text('');
+	}
+	
 	function login(){
 		//var adminType = $('#loginRole').find('option:selected').val();
 		//if(adminType == 'app'){
@@ -207,13 +226,16 @@ function getBrowser() {
 		$('#regUserName').val('');	
 		$('#regPassword').val('');
 		$('#regRePassword').val('');	
-		$('#regEmail').val('');	
+		$('#regEmail').val('');
+		$('#regTel').val('');
+		$('#regCompanyName').val('');
 		
 		$('#regOrgNameEMsg').text('');
 		$('#regUserNameEMsg').text('');	
 		$('#regPasswordEMsg').text('');
 		$('#regRePasswordEMsg').text('');	
-		$('#regEmailEMsg').text('');	
+		$('#regEmailEMsg').text('');
+		$('#regTelEMsg').text('');
 	}
 </script>
 </head>
@@ -283,7 +305,7 @@ function getBrowser() {
 											</a>
 										</div>
 										<div>
-											<a href="javascript:void(0);" onclick="show_box('signup-box'); return false;" class="forgot-password-link">
+											<a href="javascript:void(0);" id="btnRegist" onclick="show_box('signup-box'); return false;" class="forgot-password-link">
 												去注册
 												<i class="icon-arrow-right"></i>
 											</a>
@@ -324,7 +346,7 @@ function getBrowser() {
                       <fieldset>
                       	<label> <span class="block input-icon input-icon-right">
                           <input type="text" id="regOrgName" name="regOrgName" placeholder="企业ID" class="span12" onblur="onBlurRegOrgNameCheck()" value="" onkeyup="value=value.replace(/[\uFF00-\uFFFF]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\uFF00-\uFFFF]/g,''))" />
-                          <i class="icon-user"></i></span>
+                          <i class="icon-home"></i></span>
                           <span id="regOrgNameSMsg" style="font-size:12px">6~18个字符，可使用字母,数字,横线,不能以横线开头</span>
                           <span id="regOrgNameEMsg" style="font-size:12px;color:red"></span>
                         </label>
@@ -342,7 +364,7 @@ function getBrowser() {
                         </label>
                         <label> <span class="block input-icon input-icon-right">
                           <input type="password" id="regRePassword" placeholder="重复密码" class="span12" name="regRePassword" value="" onblur="onBlurRegRePasswordCheck()" />
-                          <i class="icon-retweet"></i> </span>
+                          <i class="icon-lock"></i> </span>
                           <span id="regRePasswordEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label> <span class="block input-icon input-icon-right">
@@ -350,9 +372,21 @@ function getBrowser() {
                           <i class="icon-envelope"></i></span>
                           <span id="regEmailEMsg" style="font-size:12px;color:red"></span>
                         </label>
+                        <label> <span class="block input-icon input-icon-right">
+                          <input type="text" id="regCompanyName" placeholder="企业名称" class="span12" name="regCompanyName" value="">
+                          <i class="icon-home"></i></span>
+                          <span id="regCompanyNameSEMsg" style="font-size:12px;"></span>
+                          <span id="regCompanyNameEMsg" style="font-size:12px;color:red"></span>
+                        </label>
+                        <label><span class="block input-icon input-icon-right">
+                          <input type="text" id="regTel" placeholder="联系电话" class="span12" name="regTel" value="" onblur="onBlurRegTelCheck()">
+                          <i class="icon-dashboard"></i></span>
+                          <span id="regTelSEMsg" style="font-size:12px;">固话或者移动电话号码</span>
+                          <span id="regTelEMsg" style="font-size:12px;color:red"></span>
+                        </label>
                         <label>
                           <input type="checkbox" id="agreeCBox" checked="checked">
-                          <span class="lbl"> 同意遵守【环信开发者平台服务协议】</span> 
+                          <span class="lbl"> 同意遵守<a href="http://easemob.com/content/terms.htm" target="_blank">【环信开发者平台服务协议】</a></span> 
                         </label>
                         <div class="space-24"></div>
                         <div class="row-fluid">
