@@ -50,10 +50,12 @@
 		
 		$('#username').focus();
 		
-		var QSTR = '';
-		if(QSTR == ''){
-			
+		// 官网注册链接
+		var QSTR = getQueryString('comeFrom');
+		if(QSTR == 'easemobHome'){
+			$('#btnRegist').trigger('click');
 		}
+		
 		//$('select[name="loginRole"]>option:eq(0)').attr('selected',true);
 		//changeLabel();
 	});

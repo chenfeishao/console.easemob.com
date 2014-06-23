@@ -1041,11 +1041,12 @@ function getAppProfile(appUuid){
 		alert('提示\n\n会话已失效,请重新登录!');
 		window.location.href = 'login.html';
 	} else {
+		// 获取app基本信息
 		$.ajax({
-			url:baseUrl+'/management/organizations/'+ orgName +'/applications/' + appUuid,
+			url:baseUrl + '/management/organizations/' + orgName + '/applications/' + appUuid,
 			type:'GET',
 			headers:{
-				'Authorization':'Bearer '+access_token,
+				'Authorization':'Bearer ' + access_token,
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -1071,6 +1072,24 @@ function getAppProfile(appUuid){
 				});
 				
 				$('#showName').text(respData.applicationName);
+			}
+		});
+		
+		// 获取app credential
+		//http://a1.easemob.com:80/management/organizations/belo/applications/myapptest/credentials
+		$.ajax({
+			url: baseUrl + '/management/organizations/' + orgName + '/applications/' + appUuid + '/credentials',
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer ' + access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				//alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
+			},
+			success: function(respData, textStatus, jqXHR) {
+				$('#client_id').text(respData.credentials.client_id);
+				$('#client_secret').text(respData.credentials.client_secret);
 			}
 		});
 	}
