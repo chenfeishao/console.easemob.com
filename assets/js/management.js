@@ -233,7 +233,7 @@ function regsFormValidate(){
 	var regEmail = $('#regEmail').val();
 	var regPassword = $('#regPassword').val();
 	var regRePassword = $('#regRePassword').val();
-	var regTell = $('#regTell').val();
+	var regTel = $('#regTel').val();
 	
 	if('' == regOrgName){
 		$('#regOrgNameSMsg').css('display','none');
@@ -304,10 +304,10 @@ function regsFormValidate(){
 		//$('#regEmail').focus();
 		return false;
 	}
-
-	var regTellReg = /^[0-9]*$/;
-	if(regTell != '' && !regTellReg.test(regTell)){
-		$('#regTellEMsg').text('联系电话号码格式不符合要求！');
+	var regTelReg = /^[0-9]*$/;
+	if(regTel != '' && !regTelReg.test(regTel)){
+		$('#regTelSEMsg').css('display','none');
+		$('#regTelEMsg').text('联系电话号码格式不符合要求！');
 		//$('#regEmail').focus();
 		return false;
 	}
@@ -317,7 +317,7 @@ function regsFormValidate(){
 	$('#regPasswordEMsg').text('');
 	$('#regRePasswordEMsg').text('');	
 	$('#regEmailEMsg').text('');
-	$('#regTellEMsg').text('');
+	$('#regTelEMsg').text('');
 	
 	return true;
 }
@@ -333,7 +333,7 @@ function resetForm(){
 	$('#regPassword').val('');
 	$('#regRePassword').val('');
 	$('#regEmail').val('');
-
+	$('#regTel').val('');
 }
 
 // 注册
