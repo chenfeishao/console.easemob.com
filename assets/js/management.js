@@ -783,7 +783,7 @@ function createAppFormValidate(){
  	$('#appNameMsg').text('输入正确！');
 	$('#appNameMsg').css('color','blue');
  	
- 	var nickRegex = /^[0-9a-zA-Z-_]*$/;
+ 	var nickRegex = /^[0-9a-zA-Z-_\u4e00-\u9faf]*$/;
  	if(!nickRegex.test(nick)){
 		$('#nickMsg').text('产品名称只能是汉字,字母,数字、横线、下划线及其组合!');
 		$('#nickMsg').css('color','red');
