@@ -343,6 +343,7 @@ function formSubmit(){
 	var regEmail = $('#regEmail').val();
 	var regPassword = $('#regPassword').val();
 	var mailSuffix = regEmail.substring(regEmail.indexOf('@')+1);
+	
 	var d = {
 		organization:regOrgName,
 		username:regUserName,
@@ -354,6 +355,7 @@ function formSubmit(){
 		$.ajax({
 			url:baseUrl + '/management/organizations',
 			type:'POST',
+			crossDomain:true,
 			headers:{
 				'Content-Type':'application/json'
 			},
