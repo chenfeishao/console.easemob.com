@@ -300,8 +300,11 @@ function regsFormValidate(){
 	}
 	var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
 	if('' == regEmail){
+		$('#regEmailEMsg').text('请输入邮箱！');
+		return false;
+	}
+	if(regEmail != '' && !emailReg.test(regEmail)){
 		$('#regEmailEMsg').text('请输入有效的邮箱！');
-		//$('#regEmail').focus();
 		return false;
 	}
 	var regTelReg = /^[0-9]*$/;
