@@ -23,23 +23,23 @@
 <link href="assets/css/management.css" rel="stylesheet" type="text/css" media="screen"/>
 <link href="assets/css/manage.css" rel="stylesheet" type="text/css" media="screen"/>
 <link href="assets/css/SpryTabbedPanels.css" rel="stylesheet" type="text/css" media="screen"/>
+<link href="assets/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" media="screen"/>
 
-<script src="assets/js/jquery-1.7.2.min.js"></script>
+<script src="assets/js/jquery-1.8.3.min.js"></script>
 <script src="assets/theme/bootstrap/js/bootstrap.js"></script>
+<script src="assets/theme/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+<script src="assets/theme/bootstrap/js/bootstrap-datetimepicker.fr.js" charset="UTF-8"></script>
 <script src="assets/js/ace-elements.min.js"></script>
 <script src="assets/js/ace.min.js"></script>
 <script src="assets/js/jquery.cookie.js"></script>
-<script src="assets/js/ichart.1.2.js"></script>
+<script type="text/javascript" src="assets/js/ichart.1.2.js"></script>
+<script src="assets/js/Chart.min.js"></script>
 <script src="assets/js/json2.js"></script>
 <script src="assets/js/management.js"></script>
 <script tyep="text/javascript">
 	var appUuid = getQueryString('appUuid');
 
 	$(function(){
-			
-		//window.console = window.console || {};
-		//console.log || (console.log = opera.postError)；
-
 		if (!getToken() || getToken()==''){
 			logout();
 		}
@@ -47,25 +47,29 @@
 		getAppProfile(appUuid);
 		
 		// 初始化先绘制好两幅图,默认把用户数据图显示
-		drawUser(7);
-		drawMessage(7);
 		$('#canvasMsgDiv').hide();
 		$('#canvasUserDiv').show();
 			
+		$('#userDiv').attr('checked', true);
+		$('#msgDiv').attr('checked', false);
+		
 		//控制图的显示
 		$('#userDiv').click(function(){
 			$('#userDiv').checked = true;
 			$('#msgDiv').checked = false;
 			$('#canvasMsgDiv').hide();
 			$('#canvasUserDiv').show();
+			drawLineUserSmoothly(7);
 		});
 		$('#msgDiv').click(function(){
 			$('#msgDiv').checked = true;
 			$('#userDiv').checked = false;
 			$('#canvasUserDiv').hide();
 			$('#canvasMsgDiv').show();
+			drawChatMessagesLineSmoothly(7);
 		});
 		
+	  drawLineUserSmoothly(7);
 	});
 	
 	// 当前时间的时间戳
@@ -96,37 +100,34 @@
 	    }
 	}
 		
-	// 用户数据图
-	function drawUser(internal){
-		var ii = 'I am a string';
-			console.log('变量：',ii);
-			
-		var spot=[], t,labels=[];
-		var access_token = $.cookie('access_token');
-		var orgName = $.cookie('orgName');
-		
-		var start_time = getNowTTamp() - internal*24*60*60*1000;
-		var end_time = getNowTTamp();
-		var resolution = 'day';
-		var pad = 'true';
-		
-		// 获取每个app的用户数:按时间端统计 起止按start到end算 间隔按resolution算
+	var applyRequest = {
+			orgName:$.cookie('orgName'),
+			access_token:$.cookie('access_token'),
+			appUuid:appUuid,
+			start_time:'',
+			end_time:'',
+			resolution:'',
+			pad:''
+	};
+	
+	// 获取用户数据
+	function applyUserData(applyRequest,flow,labels){
 		$.ajax({
-			url:baseUrl+'/'+ orgName +'/' + appUuid + '/counters?counter=application.collection.users&start_time='+start_time+'&end_time='+end_time+'&resolution='+resolution+'&pad='+pad,
+			url:baseUrl+'/'+ applyRequest.orgName +'/' + applyRequest.appUuid + '/counters?counter=application.collection.users&start_time='+applyRequest.start_time+'&end_time='+applyRequest.end_time+'&resolution='+applyRequest.resolution+'&pad='+applyRequest.pad,
 			type:'GET',
 			async:false,
 			headers:{
-				'Authorization':'Bearer ' + access_token,
+				'Authorization':'Bearer ' + applyRequest.access_token,
 				'Content-Type':'application/json'
 			},
 			success: function(respData, textStatus, jqXHR) {
 				$.each(respData.counters,function(){
 					if(this.values.length == 0){
-						spot.push(0);
+						flow.push(0);
 						labels.push(0);
 					} else {
 						$.each(this.values,function(){
-							spot.push(this.value);
+							flow.push(this.value);
 							labels.push(format1(this.timestamp));
 						});
 					}
@@ -135,211 +136,296 @@
 			error: function(jqXHR, textStatus, errorThrown) {
 					alert('提示\n\n数据获取失败!');
 			},
-		});
-
-		var yMax = getMaximin(spot,'max');
-		var sspace = 0;
-		if(yMax > 0 && yMax < 1000){
-				sspace = 10;
-		} else if(yMax > 1000 && yMax < 10000){
-				sspace = 100;
-		} else if(yMax > 10000 && yMax < 100000){
-				sspace = 1000;
-		}
-		
-		var data = [
-			{
-				name : internal+'日内',
-				value : spot,
-				color:'#0d8ecf',
-				line_width:1
-			}
-		];
-
-		var line = new iChart.LineBasic2D({
-			render : 'canvasUserDiv',
-			data : data,
-			align : 'center',   // 图标的显示位置center 居中
-			title : '每日新增用户数量统计',
-			subtitle : '( 单位：个)',
-			footnote : '数据来源：环信',
-			width : 1000,
-			height : 450,
-			tip:{
-				enable : true,
-				shadow : true
-			},
-			legend : {
-				enable : true,
-				row : 2,//设置在一行上显示，与column配合使用
-				column : 'max',
-				valign :'top',
-				sign : 'bar',
-				background_color : null,//设置透明背景
-				offsetx : -80,//设置x轴偏移，满足位置需要
-				border : true
-			},
-			crosshair : {
-				enable : true,
-				line_color : '#62bce9'
-			},
-			sub_option : {
-				label : false,
-				point_hollow : false
-			},
-			coordinate : {
-				width : 770,   // 坐标线的长度
-				height : yMax*10 + sspace,  // 坐标线的高度
-				axis : {
-					color : '#9f9f9f',
-					width : [0, 0, 2, 2]  //width : [0, 0, 2, 2] 分别代表上下左右的宽度
-				},
-				grids : {
-					vertical : {
-						way : 'share_alike',
-						value : spot.length - 1   // 横轴有几个grid
-				}
-			},
-			scale:
-				[{
-					position : 'left',
-					start_scale : 0,
-					end_scale : yMax + sspace,  //y轴最大值
-					scale_space : sspace,
-					scale_size : 2,
-					scale_color : '#1f7e92'
-				},{
-					position : 'bottom',
-					labels : labels
-				}]
-			}
-		});
-			
-		//开始画图
-		line.draw();
+		});	
 	}
 	
-	
-	// 消息发送统计图
-	function drawMessage(internal){
-		var spot=[], t,labels1=[];
-		var access_token = $.cookie('access_token');
-		var orgName = $.cookie('orgName');
-		
-		var start_time1 = getNowTTamp() - internal*24*60*60*1000;
-		var end_time1 = getNowTTamp();
-		var resolution1 = 'day';
-		var pad1 = 'true';
-		
-		// 获取每个app的用户数:按时间端统计 起止按start到end算 间隔按resolution算
+	// 获取消息数据
+	function applyChatMessagesData(applyRequest,flow,labels){
 		$.ajax({
-			url:baseUrl+'/'+ orgName +'/' + appUuid + '/counters?counter=application.collection.chatmessages&start_time='+start_time1+'&end_time='+end_time1+'&resolution='+resolution1+'&pad='+pad1,
+			url:baseUrl+'/'+ applyRequest.orgName +'/' + applyRequest.appUuid + '/counters?counter=application.collection.chatmessages&start_time='+applyRequest.start_time+'&end_time='+applyRequest.end_time+'&resolution='+applyRequest.resolution+'&pad='+applyRequest.pad,
 			type:'GET',
 			async:false,
 			headers:{
-				'Authorization':'Bearer ' + access_token,
+				'Authorization':'Bearer ' + applyRequest.access_token,
 				'Content-Type':'application/json'
 			},
 			success: function(respData, textStatus, jqXHR) {
 				$.each(respData.counters,function(){
 					if(this.values.length == 0){
-						spot.push(0);
-						labels1.push(0);
+						flow.push(0);
+						labels.push(0);
 					} else {
 						$.each(this.values,function(){
-							spot.push(this.value);
-							labels1.push(format1(this.timestamp));
+							flow.push(this.value);
+							labels.push(format1(this.timestamp));
 						});
 					}
 				});
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert('提示\n\n数据获取失败!');
+					alert('提示\n\n数据获取失败!');
 			},
-		});
-
-			var yMax1 = getMaximin(spot,'max');
+		});	
+	}
+	
+	// 用户图表
+	function drawLineUserSmoothly(internal){
+			var flow=[], labels=[];
+			 
+			applyRequest.start_time = getNowTTamp() - internal*24*60*60*1000;
+			applyRequest.end_time = getNowTTamp();
+			applyRequest.resolution = 'day';
+			applyRequest.pad = 'true';
 			
+			applyUserData(applyRequest,flow,labels);
+			
+			var flowMax = getMaximin(flow,"max");
 			var sspace = 0;
-			if(yMax1 > 10 && yMax1 < 100){
-					sspace = 1;
-			} else if(yMax1 > 100 && yMax1 < 1000){
-					sspace = 10;
-			} else if(yMax1 > 1000 && yMax1 < 10000){
+			 if(flowMax > 0 && flowMax < 10000){
 					sspace = 100;
-			} else if(yMax1 > 10000 && yMax1 < 100000){
+			} else if(flowMax > 10000 && flowMax < 100000){
 					sspace = 1000;
 			}
-
-			var data = [
-				{
-					name : internal+'日内',
-					value : spot,
-					color:'#0d8ecf',
-					line_width:1  // 折线的粗线
+			var data = [{
+				//name : 'PVssssss',
+				value: flow,
+				color: '#1f7e92',
+				line_width: 1
 				}
 			];
-			var line = new iChart.LineBasic2D({
-				render : 'canvasMsgDiv',
-				data : data,
-				align : 'center',   // 图标的显示位置center 居中
-				title : '每日消息发送数量统计',
-				subtitle : '( 单位：条)',
-				footnote : '数据来源：环信',
+			var chart = new iChart.LineBasic2D({
+				render : 'canvasUserDiv',
+				data: data,
+				align:'center',
+				title : {
+					text:'每日新增用户数量统计',
+					//font : '微软雅黑',
+					fontsize:24,
+					//color:'#b4b4b4'
+				},
+				subtitle : {
+					text:'(单位：个)',
+					//font : '微软雅黑',
+					//color:'#b4b4b4'
+				},
+				footnote : {
+					text:'数据来源: 环信',
+					//font : '微软雅黑',
+					fontsize:11,
+					fontweight:600,
+					padding:'0 28',
+					//color:'#b4b4b4'
+				},
 				width : 1000,
-				height : 550,
+				height : 450,
+				shadow:true,
+				shadow_color : '#202020',
+				shadow_blur : 8,
+				shadow_offsetx : 0,
+				shadow_offsety : 0,
+				background_color: null,
+				animation : true,   //开启过渡动画
+				animation_duration:1000,  //1s完成动画 
 				tip:{
-					enable : true,
-					shadow : true
-				},
-				legend : {
-					enable : true,
-					row : 2,//设置在一行上显示，与column配合使用
-					column : 'max',
-					valign :'top',
-					sign : 'bar',
-					background_color : null,//设置透明背景
-					offsetx : -80,//设置x轴偏移，满足位置需要
-					border : true
-				},
-				crosshair : {
-					enable : true,
-					line_color : '#62bce9'
-				},
-				sub_option : {
-					label : false,
-					point_hollow : false
-				},
-				coordinate : {
-					width : 770,   // 坐标线的长度
-					height : yMax1*100 + sspace,  // 坐标线的高度
- 					axis : {
-						color : '#9f9f9f',
-						width : [0, 0, 2, 2]  //width : [0, 0, 2, 2] 分别代表上下左右的宽度
-					},
-					grids : {
-						vertical : {
-							way : 'share_alike',
-							value : spot.length - 1   // 横轴有几个grid
+					enable:true,
+					shadow:true,
+					listeners:{
+						//tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
+						parseText:function(tip,name,value,text,i){
+							return "<span style='color:#005268;font-size:12px;'>"+labels[i]+"<br/> 新增用户数约:"+
+							"</span><span style='color:#005268;font-size:20px;'>"+value+"个</span>";
+						}
 					}
 				},
-				scale:
-					[{
-						position : 'left',
-						start_scale : 0,
-						end_scale : yMax1 + sspace,  //y轴最大值
-						scale_space : sspace,     // y轴数值的梯度
-						scale_size : 2,
-						scale_color : '#1f7e92'
+				crosshair:{
+					enable:true,
+					line_color:'#62bce9'
+				},
+				sub_option : {
+					smooth : true,
+					label:false,
+					hollow:false,
+					hollow_inside:false,
+					point_size:6
+				},
+				coordinate:{
+					width:770,
+					height:300,
+					striped_factor : 0.18,
+					grid_color:'#9f9f9f',
+					axis:{
+						color:'#9f9f9f',
+						width:[0,0,2,2]
+					},
+					scale:[{
+						position:'left',
+						start_scale:0,
+						end_scale:Math.ceil(flowMax + sspace),
+						scale_space:sspace,
+						scale_size:2,
+						scale_enable : false,
+						label : {color:'#1f7e92',font : '微软雅黑',fontsize:11,fontweight:600},
+						scale_color:'#1f7e92'
 					},{
-						position : 'bottom',
-						labels : labels1
+						position:'bottom',
+						label : {color:'#1f7e92',font : '微软雅黑',fontsize:11,fontweight:600},
+						scale_enable : false,
+						labels:labels
 					}]
 				}
 			});
 			
+			//利用自定义组件构造左侧说明文本
+			chart.plugin(new iChart.Custom({
+				drawFn:function(){
+					//计算位置
+					var coo = chart.getCoordinate(),
+					x = coo.get('originx'),
+					y = coo.get('originy'),
+					w = coo.width,
+					h = coo.height;
+					//在左上侧的位置，渲染一个单位的文字
+					chart.target.textAlign('start')
+					.textBaseline('bottom')
+					.textFont('600 11px 微软雅黑')
+					.fillText('新增用户数(个)',x-40,y-12,false,'#9d987a')
+					.textBaseline('top')
+					.fillText('         (时间)',x+w+12,y+h+10,false,'#9d987a');
+				}
+			}));
+			
 			//开始画图
-			line.draw();
+			chart.draw();
+	}
+	
+	// 消息发送统计图
+	function drawChatMessagesLineSmoothly(internal){
+			var flow=[], labels=[];
+			 
+			applyRequest.start_time = getNowTTamp() - internal*24*60*60*1000;
+			applyRequest.end_time = getNowTTamp();
+			applyRequest.resolution = 'day';
+			applyRequest.pad = 'true';
+			
+			applyChatMessagesData(applyRequest,flow,labels);
+			
+			var flowMax = getMaximin(flow,"max");
+			var sspace = 0;
+			if(flowMax > 1000 && flowMax < 1000){
+					sspace = 100;
+			} else if(flowMax > 1000 && flowMax < 100000){
+					sspace = 500;
+			}
+			var data = [{
+				//name : 'PVssssss',
+				value: flow,
+				color: '#1f7e92',
+				line_width: 1
+				}
+			];
+			var chart = new iChart.LineBasic2D({
+				render : 'canvasMsgDiv',
+				data: data,
+				align:'center',
+				title : {
+					text:'每日消息发送数量统计',
+					//font : '微软雅黑',
+					fontsize:24,
+					//color:'#b4b4b4'
+				},
+				subtitle : {
+					text:'(单位：条)',
+					//font : '微软雅黑',
+					//color:'#b4b4b4'
+				},
+				footnote : {
+					text:'数据来源: 环信',
+					//font : '微软雅黑',
+					fontsize:11,
+					fontweight:600,
+					padding:'0 28',
+					//color:'#b4b4b4'
+				},
+				width : 1000,
+				height : 450,
+				shadow:true,
+				shadow_color : '#202020',
+				shadow_blur : 8,
+				shadow_offsetx : 0,
+				shadow_offsety : 0,
+				background_color: null,
+				animation : true,   //开启过渡动画
+				animation_duration: 1000,  //1000ms完成动画 
+				tip:{
+					enable:true,
+					shadow:true,
+					listeners:{
+						//tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
+						parseText:function(tip,name,value,text,i){
+							return "<span style='color:#005268;font-size:12px;'>"+labels[i]+"<br/> 发送消息数约:"+
+							"</span><span style='color:#005268;font-size:20px;'>"+value+"条</span>";
+						}
+					}
+				},
+				crosshair:{
+					enable:true,
+					line_color:'#62bce9'
+				},
+				sub_option : {
+					smooth : true,
+					label:false,
+					hollow:false,
+					hollow_inside:false,
+					point_size:6
+				},
+				coordinate:{
+					width:770,
+					height:300,
+					striped_factor : 0.18,
+					grid_color:'#9f9f9f',
+					axis:{
+						color:'#9f9f9f',
+						width:[0,0,4,4]
+				},
+				scale:[{
+						position:'left',
+						start_scale:0,
+						end_scale:Math.ceil(flowMax + sspace),
+						scale_space:sspace,
+						scale_size:2,
+						scale_enable : false,
+						label : {color:'#1f7e92',font : '微软雅黑',fontsize:11,fontweight:600},
+						scale_color:'#1f7e92'
+					},{
+						position:'bottom',
+						label : {color:'#1f7e92',font : '微软雅黑',fontsize:11,fontweight:600},
+						scale_enable : false,
+						labels:labels
+					}]
+				}
+			});
+			
+			//利用自定义组件构造左侧说明文本
+			chart.plugin(new iChart.Custom({
+				drawFn:function(){
+					//计算位置
+					var coo = chart.getCoordinate(),
+					x = coo.get('originx'),
+					y = coo.get('originy'),
+					w = coo.width,
+					h = coo.height;
+					//在左上侧的位置，渲染一个单位的文字
+					chart.target.textAlign('start')
+					.textBaseline('bottom')
+					.textFont('600 11px 微软雅黑')
+					.fillText('消息数量(条)',x-40,y-12,false,'#9d987a')
+					.textBaseline('top')
+					.fillText('         (时间)',x+w+12,y+h+10,false,'#9d987a');
+				}
+			}));
+			
+			//开始画图
+			chart.draw();
 	}
 	
 	// 应用概述页
@@ -448,6 +534,7 @@
     		<hr>
     		<div style="width:1000px; margin:0 auto; overflow:hidden;">
     			<div style="float:right;">
+							<input type="hidden" id="dtp_input2" value="" /><br/>
 		    		<input type="radio" name="divRadio" id="userDiv" checked="checked"/><span class="lbl">新增用户</span>
 		    		<input type="radio" name="divRadio" id="msgDiv" /><span class="lbl">消息</span>
 		    	</div>
@@ -457,8 +544,9 @@
 	    		<!-- 消息数据 -->
 	    		<div id='canvasMsgDiv'></div>
     		</div>
-    </div>
-  </div>
+    	</div>
+  	</div>
+	</div>
 </div>
 </body>
 </html>
