@@ -798,7 +798,7 @@ function createAppFormValidate(){
  	$('#nickMsg').text('输入正确！');
 	$('#nickMsg').css('color','blue');
  
- 	var appDescReg = /^[0-9a-zA-Z]{0,100}$/;
+ 	var appDescReg = /^[0-9a-zA-Z\u4e00-\u9faf]{0,100}$/;
 	if(!appDescReg.test(appDesc)){
 		$('#appDescMsg').css('color','red');
 		$('#appDesc').focus();
