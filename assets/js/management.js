@@ -1420,14 +1420,14 @@ function updateAppUserPassword(){
   var pwdMondifyVal = $('#pwdMondify').val();
   var pwdMondifytwoVal = $('#pwdMondifytwo').val();
 	
-	var passwordReg = /^[0-9a-zA-Z]{6,20}$/;
+	var passwordReg = /^[0-9a-zA-Z]{1,100}$/;
   if(pwdMondifyVal == ''){
   	$('#pwdMondify').focus();
 		$('#pwdMondifySpan').html('请输入新密码');
 		return;
 	} else if(!passwordReg.test(pwdMondifyVal)){
 		$('#pwdMondify').focus();
-		$('#pwdMondifySpan').html('只能输入6~20位字母或者数字');
+		$('#pwdMondifySpan').html('只能输入1~100位字母或者数字');
 		return;
 	} else {
 		$('#pwdMondifySpan').html('');
