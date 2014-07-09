@@ -487,6 +487,9 @@ function orgAdminLogin() {
 		'password':$('#password').val()
 	};
 	if(loginFormValidate()){
+			$('#cont').text('登录中...');
+			$('#loginBtn').attr("disabled",true); 
+					
 			// 登录获取token
 			$.ajax({
 				url:baseUrl+'/management/token',
@@ -507,9 +510,13 @@ function orgAdminLogin() {
 						if('error_description' == tmpArr[i][0]){
 							if(tmpArr[i][1].indexOf("User must be confirmed to authenticate") > -1) {
 								errorMsg = '登陆失败，账户未激活!';
+								$('#cont').text('登录');
+								$('#loginBtn').attr("disabled",false);
 							}
 							if(tmpArr[i][1].indexOf("invalid username or password") > -1) {
 								errorMsg = '登陆失败，用户名或者密码错误!';
+								$('#cont').text('登录');
+								$('#loginBtn').attr("disabled",false);
 							}
 						}
 					}
@@ -537,6 +544,9 @@ function orgAdminLogin() {
 					window.location.href = 'app_list.html';
 				}
 		});
+	} else {
+		$('#cont').text('登录');
+		$('#loginBtn').attr("disabled",false);
 	}
 }
 
