@@ -1094,7 +1094,7 @@ function getAppProfile(appUuid){
 					var tag = this.allow_open_registration?'0':'1';
 					$('#appKey').text(organizationName+'#'+applicationName);
 					$('#xmlandroidAppkey').text(organizationName+'#'+applicationName);
-					$('#xmliosAppkey').text(organizationName+'#'+applicationName);
+					//$('#xmliosAppkey').text(organizationName+'#'+applicationName);
 					$('#created').text(created);
 					$('#modified').text(modified);
 					$('#allowOpen').text(allowOpen);
