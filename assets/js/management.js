@@ -1344,8 +1344,12 @@ function saveNewAppAdmin(appUuid){
 	}
 }
 
+//===================================================== User ==================================================================================
 // 获取某个app下的用户
 function getAppUserList(appUuid,pageAction){
+	$('#paginau').show();
+	$('#paginauSearch').hide();
+	
 	// 获取token
 	var access_token = $.cookie('access_token');
 	var cuser = $.cookie('cuser');
@@ -1408,6 +1412,51 @@ function getAppUserList(appUuid,pageAction){
 				} else {
 					updateUsersPageStatus();	
 				}
+			}
+		});
+	}
+}
+
+// 搜索IM用户
+function searchUser(appUuid, queryString){
+	// 获取token
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	
+	if(!access_token || access_token=='') {
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		
+		$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/' + queryString,
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('tbody').html('');
+				var option = '<tr><td class="text-center" colspan="7">无数据!</td></tr>';
+				$('#appUserBody').append(option);
+				$('#paginau').hide();
+			},
+			success: function(respData, textStatus, jqXHR) {
+				$('tbody').html('');
+				
+				$(respData.entities).each(function(){
+					var username = this.username;
+					var created = format(this.created);
+					var option = '<tr>'+
+								'<td class="text-center">'+username+'</td>'+
+							 	'<td class="text-center">'+created+'</td>'+
+							 	'<td class="text-center"><a href="#passwordMondify" id="passwdMod${status.index }" onclick="setUsername(\'' + appUuid + '\',\''+ username +'\');" data-toggle="modal" role="button" class="btn btn-mini btn-info">重置密码</a>'+
+							 	' | <a  class="btn btn-mini btn-info" href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a></td>'+
+					 		'</tr>';
+					$('#appUserBody').append(option);
+					$('#paginau').hide();
+				});
 			}
 		});
 	}
