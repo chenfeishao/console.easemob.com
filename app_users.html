@@ -52,6 +52,11 @@
 		
 		getAppProfile(appUuid);
 		getAppUserList(appUuid);
+		
+		$('#searchForm').submit(function(){
+				searchUserTmp();
+				return false;
+		});
 	});	
 	
 	// 上一页数据
@@ -183,7 +188,7 @@
 				</div>
         <div class="row-fluid">
 						<div class="inbox-header">
-							<form action="#" class="form-search pull-right">
+							<form id="searchForm" action="#" class="form-search pull-right">
 								<div class="input-append">
 									<input class="m-wrap" value="" id="userInbox" type="text" placeholder="输入完整用户名" />
 									<button class="btn green" id="searchBtn" onclick="searchUserTmp()" type="button">搜索</button>
