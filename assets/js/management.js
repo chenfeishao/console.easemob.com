@@ -331,12 +331,21 @@ function isUsernameExist(username){
 
 //注册表单清空
 function resetForm(){
-	$('#regOrgName').val('');
-	$('#regUserName').val('');
-	$('#regPassword').val('');
-	$('#regRePassword').val('');
-	$('#regEmail').val('');
-	$('#regTel').val('');
+		$('#regOrgName').val('');
+		$('#regUserName').val('');	
+		$('#regPassword').val('');
+		$('#regRePassword').val('');	
+		$('#regEmail').val('');
+		$('#regCompanyName').val('');
+		$('#regTel').val('');
+		
+		$('#regOrgNameEMsg').text('');
+		$('#regUserNameEMsg').text('');	
+		$('#regPasswordEMsg').text('');
+		$('#regRePasswordEMsg').text('');	
+		$('#regEmailEMsg').text('');
+		$('#regCompanyNameEMsg').val('');
+		$('#regTelEMsg').text('');
 }
 
 // 注册
@@ -939,21 +948,34 @@ function updateUsersPageStatus(){
 			},
 			success: function(respData, textStatus, jqXHR) {
 				total = respData.count;
-				var totalPage = (total%10==0)?(parseInt(total/10)):(parseInt(total/10)+1);
+				var totalPage = (total % 10 == 0) ? (parseInt(total / 10)) : (parseInt(total / 10) + 1);
 				
+				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
+				var ulB = '<ul>';
+				var ulE = '</ul>';
+				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
+				var textOp2 = '<li> <a href="javascript:void(0);" onclick="getNextAppUserList();">下一页</a> </li>';
+				$('#paginau').html('');
 				// 首页
 				if(pageNo == 1){
 					if(totalPage == 1){
-						$(pageLi[0]).hide();
-						$(pageLi[1]).hide();
+						//$(pageLi[0]).hide();
+						//$(pageLi[1]).hide();
+						$('#paginau').append(ulB + ulE);
 					} else {
-						$(pageLi[0]).hide();
-						$(pageLi[1]).show();
+						$('#paginau').append(ulB + textOp2 + ulE);
+						//$(pageLi[0]).hide();
+						//$(pageLi[1]).show();
 					}
 					// 尾页
 				} else if(totalPage ==  pageNo){
-					$(pageLi[0]).show();
-					$(pageLi[1]).hide();
+					$('#paginau').append(ulB + textOp1 + ulE);
+					//$(pageLi[0]).show();
+					//$(pageLi[1]).hide();
+				} else {
+					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
+					//$(pageLi[0]).show();
+					//$(pageLi[1]).show();
 				}
 			}
 		});
@@ -1346,10 +1368,8 @@ function saveNewAppAdmin(appUuid){
 
 //===================================================== User ==================================================================================
 // 获取某个app下的用户
-function getAppUserList(appUuid,pageAction){
-	$('#paginau').show();
-	$('#paginauSearch').hide();
-	
+function getAppUserList(appUuid, pageAction){
+
 	// 获取token
 	var access_token = $.cookie('access_token');
 	var cuser = $.cookie('cuser');
@@ -1367,6 +1387,7 @@ function getAppUserList(appUuid,pageAction){
 		if(typeof(pageAction)!='undefined' && pageAction != ''){	
 			temp = '&cursor='+cursors[pageNo];
 		}
+		
 		$.ajax({
 			url:baseUrl+'/'+ orgName +'/' + appUuid + '/users?limit=10' + temp,
 			type:'GET',
@@ -1408,7 +1429,6 @@ function getAppUserList(appUuid,pageAction){
 					for(var i=0;i<pageLi.length;i++){
 						$(pageLi[i]).hide();
 					}
-					
 				} else {
 					updateUsersPageStatus();	
 				}
@@ -1438,7 +1458,7 @@ function searchUser(appUuid, queryString){
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				$('tbody').html('');
-				var option = '<tr><td class="text-center" colspan="7">无数据!</td></tr>';
+				var option = '<tr><td class="text-center" colspan="7">用户不存在!</td></tr>';
 				$('#appUserBody').append(option);
 				$('#paginau').hide();
 			},

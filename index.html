@@ -245,8 +245,8 @@ function getBrowser() {
 		$('#regPassword').val('');
 		$('#regRePassword').val('');	
 		$('#regEmail').val('');
+		$('#regCompanyName').val('sss');
 		$('#regTel').val('');
-		$('#regCompanyName').val('');
 		
 		$('#regOrgNameEMsg').text('');
 		$('#regUserNameEMsg').text('');	
@@ -365,7 +365,7 @@ function getBrowser() {
                       	<label> <span class="block input-icon input-icon-right">
                           <input type="text" id="regOrgName" name="regOrgName" placeholder="企业ID" class="span12" onblur="onBlurRegOrgNameCheck()" value="" onkeyup="value=value.replace(/[\uFF00-\uFFFF]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\uFF00-\uFFFF]/g,''))" />
                           <i class="icon-home"></i></span>
-                          <span id="regOrgNameSMsg" style="font-size:12px">6~18个字符，可使用字母,数字,横线,不能以横线开头</span>
+                          <span id="regOrgNameSMsg" style="font-size:12px">3~18个字符，可使用字母,数字,横线,不能以横线开头</span>
                           <span id="regOrgNameEMsg" style="font-size:12px;color:red"></span>
                         </label>
                       	<label> <span class="block input-icon input-icon-right">
@@ -392,7 +392,7 @@ function getBrowser() {
                           <span id="regEmailEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label> <span class="block input-icon input-icon-right">
-                          <input type="text" id="regCompanyName" placeholder="企业名称" class="span12" name="regCompanyName" value="">
+                          <input type="text" id="regCompanyName" placeholder="企业名称" class="span12" name="regCompanyName" value="" />
                           <i class="icon-home"></i></span>
                           <span id="regCompanyNameSEMsg" style="font-size:12px;"></span>
                           <span id="regCompanyNameEMsg" style="font-size:12px;color:red"></span>
