@@ -694,8 +694,8 @@ function adminInfo(){
 				$(respData.data).each(function(){
 					$('#username').text(this.username);
 					$('#email').text(this.email);
-					$('#companyName').text(this.properties.regCompanyName);
-					$('#telephone').text(this.properties.regTel);
+					$('#companyName').text(this.properties.companyName);
+					$('#telephone').text(this.properties.telephone);
 				});
 			}
 		});
@@ -710,10 +710,10 @@ function updateAdminInfo(username, companyName, telephone){
 	var orgName = $.cookie('orgName');
 	var d = {};
 	if(companyName != '' && companyName != null){
-		d.companyName = '';
+		d.companyName = companyName;
 	}
 	if(telephone != '' && telephone != null){
-		d.telephone = '';
+		d.telephone = telephone;
 	}
 	
 	if(!access_token || access_token==''){
@@ -721,7 +721,7 @@ function updateAdminInfo(username, companyName, telephone){
 		window.location.href = 'index.html';
 	} else {
 		$.ajax({
-			url: baseUrl + '/management/users',
+			url: baseUrl + '/management/users/' + username,
 			type:'PUT',
 			data:JSON.stringify(d),
 			headers:{
@@ -733,6 +733,17 @@ function updateAdminInfo(username, companyName, telephone){
 			},
 			success:function(respData, textStatus, jqXHR){
 				alert('修改成功!');
+				
+				$('#companyNameInput').val('');
+				$('#telephoneInput').val('');
+				$('#companyNameInput').hide();
+				$('#telephoneInput').hide();
+				$('#showEditBtn').show();
+				$('#saveAdminInfoBtn').hide();
+				$('#cancelSaveAdminInfoBtn').hide();
+				$('#telephone').show();
+				$('#companyName').show();
+		
 				adminInfo();
 			}
 		});
