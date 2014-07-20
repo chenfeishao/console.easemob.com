@@ -320,6 +320,7 @@ function regsFormValidate(){
 	$('#regPasswordEMsg').text('');
 	$('#regRePasswordEMsg').text('');	
 	$('#regEmailEMsg').text('');
+	$('#regCompanyNameEMsg').text('');
 	$('#regTelEMsg').text('');
 	
 	return true;
@@ -344,7 +345,7 @@ function resetForm(){
 		$('#regPasswordEMsg').text('');
 		$('#regRePasswordEMsg').text('');	
 		$('#regEmailEMsg').text('');
-		$('#regCompanyNameEMsg').val('');
+		$('#regCompanyNameEMsg').text('');
 		$('#regTelEMsg').text('');
 }
 
@@ -354,14 +355,19 @@ function formSubmit(){
 	var regUserName = $('#regUserName').val();
 	var regEmail = $('#regEmail').val();
 	var regPassword = $('#regPassword').val();
+	var regCompanyName = $('#regCompanyName').val();
+	var regTel = $('#regTel').val();
 	var mailSuffix = regEmail.substring(regEmail.indexOf('@')+1);
 	
 	var d = {
 		organization:regOrgName,
 		username:regUserName,
 		email:regEmail,
-		password:regPassword
+		password:regPassword,
+		companyName:regCompanyName,
+		telephone:regTel
 	};
+	
 	if(regsFormValidate()){
 		// 注册用户信息
 		$.ajax({
@@ -434,7 +440,6 @@ function sysAdminLogin() {
 		'username':$('#username').val(),
 		'password':$('#password').val()
 	};
-	
 	if(loginFormValidate()){
 			// 登录获取token
 			$.ajax({
@@ -495,6 +500,7 @@ function orgAdminLogin() {
 		'username':$('#username').val(),
 		'password':$('#password').val()
 	};
+
 	if(loginFormValidate()){
 			$('#cont').text('登录中...');
 			$('#loginBtn').attr("disabled",true); 
@@ -688,7 +694,46 @@ function adminInfo(){
 				$(respData.data).each(function(){
 					$('#username').text(this.username);
 					$('#email').text(this.email);
+					$('#companyName').text(this.properties.regCompanyName);
+					$('#telephone').text(this.properties.regTel);
 				});
+			}
+		});
+	}
+}
+
+// 修改登录用户信息
+function updateAdminInfo(username, companyName, telephone){
+	// get org admin token
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	var d = {};
+	if(companyName != '' && companyName != null){
+		d.companyName = '';
+	}
+	if(telephone != '' && telephone != null){
+		d.telephone = '';
+	}
+	
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'index.html';
+	} else {
+		$.ajax({
+			url: baseUrl + '/management/users',
+			type:'PUT',
+			data:JSON.stringify(d),
+			headers:{
+				'Authorization':'Bearer ' + access_token,
+				'Content-Type':'application/json'
+			},
+			error:function(respData, textStatus, jqXHR){
+				alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
+			},
+			success:function(respData, textStatus, jqXHR){
+				alert('修改成功!');
+				adminInfo();
 			}
 		});
 	}
