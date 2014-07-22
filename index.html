@@ -57,12 +57,17 @@
 
 <script type="text/javascript">
 	$(function(){
+		var browserVersion = getBrowserVersion();
+		if(browserVersion != '' && browserVersion < 10){
+			alert('系统检测到您的浏览器版本是IE10以下,为了不影响您的使用,建议先升级浏览器或更换其它浏览器!')
+		}
+		
 		//读取cookie
 		if($('#rememberme:checked').length>0){
 			$('#username').val($.cookie('tvs-cookies-userName'));
 			$('#password').val($.cookie('tvs-cookies-password'));
 		}
-		
+
 		$('#username').focus();
 		
 		// 官网注册链接
@@ -71,8 +76,6 @@
 			$('#btnRegist').trigger('click');
 		}
 		
-		//$('select[name="loginRole"]>option:eq(0)').attr('selected',true);
-		//changeLabel();
 	});
 	
 /**
@@ -80,7 +83,6 @@
  * @return
  */
 function getBrowser() {
-    var OsObject = ""; 
     if(navigator.userAgent.indexOf("MSIE")>0) { 
          return "MSIE"; 
     } 
@@ -90,7 +92,32 @@ function getBrowser() {
     if(isChrome=navigator.userAgent.indexOf("Chrome")>0){ 
          return "Chrome"; 
     }
-} 
+}
+ 
+	/**
+	 * 判断浏览器具体版本号
+	 * @return
+	 */
+	function getBrowserVersion() {
+	    if(navigator.userAgent.indexOf("MSIE 6.0") > 0 ) { 
+	         return "6"; 
+	    }
+	    if(navigator.userAgent.indexOf("MSIE 7.0") > 0 ) { 
+	         return "7"; 
+	    } 
+	   	if(navigator.userAgent.indexOf("MSIE 8.0") > 0 ) { 
+	         return "8"; 
+	    }
+	    if(navigator.userAgent.indexOf("MSIE 9.0") > 0 ) { 
+	         return "9"; 
+	    }
+	    if(navigator.userAgent.indexOf("MSIE 10.0") > 0 ) { 
+	         return "10"; 
+	    }
+	    if(navigator.userAgent.indexOf("MSIE 11.0") > 0 ) { 
+	         return "11"; 
+	    }
+	} 
 	
 	// 回车键登录
 	function keyLogin(){

@@ -794,7 +794,7 @@ function updateAdminPasswd(){
 	var username = $.cookie('cuser');
 	var d = {
 		'oldpassword':oldpassword,
-		'newpassword':newpassword,
+		'newpassword':newpassword
 	}
 	var dtoken = {
 		'grant_type':'password',
