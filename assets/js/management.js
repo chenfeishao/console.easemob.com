@@ -1,4 +1,4 @@
-// Host
+﻿	// Host
 //var baseUrl = 'https://api.easemob.com';
 var baseUrl = 'https://a1.easemob.com';
 
@@ -28,6 +28,20 @@ $(function() {
 		$('#formSubBtn').disabled = true;
 	}
 }) 
+
+// 全角转换成半角
+function ToCDB(str) {
+	var tmp = "";
+	for(var i=0;i<str.length;i++) {
+		if(str.charCodeAt(i)>65248&&str.charCodeAt(i)<65375) {
+			tmp += String.fromCharCode(str.charCodeAt(i)-65248);
+		} else {
+			tmp += String.fromCharCode(str.charCodeAt(i));
+		}
+	}
+
+	return tmp
+}
 
 // 获取url参数
 function getQueryString(name) {
@@ -547,7 +561,6 @@ function orgAdminLogin() {
 					$.each(json, function(i) {
 					    orgName = i;
 					});
-					
 					var date = new Date();
 					date.setTime(date.getTime()+(1 * 24 * 60 * 60 * 1000));
 					$.cookie('access_token',access_token,{path:'/',expires:date});
@@ -567,25 +580,25 @@ function orgAdminLogin() {
 
 // APP管理员登录
 function appAdminLogin() {
-	var appkey = $('#appkey').val();
+	var appkey = $('#qiyeid').val();
 	// appkey validate
 	if('' == appkey){
-		$('#appkeyEMsg').text('请输入企业标识！');
+		$('#regqiyeid').text('请输入企业ID！');
 		return;
 	}
 	
-	var appkeyRegex = /^(?!-)(?!.*?-$)[a-zA-Z0-9-]+#[0-9a-zA-Z]{1,18}$/;
+	var appkeyRegex = /^(?!-)(?!.*?-$)[a-zA-Z0-9-]+$/;
 	if(!appkeyRegex.test(appkey)){
-	 	$('#appkeyEMsg').text('只能使用数字,字母,横线,且不能以横线开头和结尾！');
+	 	$('#regqiyeid').text('只能使用数字,字母,横线,且不能以横线开头和结尾！');
 		return;
  	}
-  $('appkeyEMsg').text('');
+  $('qiyeid').text('');
 	
 	var org = '';
 	var app = '';
 	
-  org = appkey.substring(0, appkey.indexOf('#', 0));
-	app = appkey.substring(appkey.indexOf('#', 0) + 1, appkey.length);
+    org = $('#qiyeid').val();
+	app = $('#yingyongname').val();
 	
 	var d = {
 		'grant_type':'password',
@@ -637,7 +650,7 @@ function appAdminLogin() {
 				  $.cookie('orgName',org,{path:'/',expires:date});
 				  $.cookie('appName',app,{path:'/',expires:date});
 				  
-					window.location.href = 'appAdmin_profile.html';
+					window.location.href = 'app_profile.html';
 				}
 		});
 	}
@@ -688,7 +701,6 @@ function adminInfo(){
 				'Content-Type':'application/json'
 			},
 			error:function(respData, textStatus, jqXHR){
-				alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success:function(respData, textStatus, jqXHR){
 				$(respData.data).each(function(){
@@ -729,7 +741,6 @@ function updateAdminInfo(username, companyName, telephone){
 				'Content-Type':'application/json'
 			},
 			error:function(respData, textStatus, jqXHR){
-				alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success:function(respData, textStatus, jqXHR){
 				alert('修改成功!');
@@ -872,13 +883,15 @@ function createAppFormValidate(){
  	}
  	$('#nickMsg').text('输入正确！');
 	$('#nickMsg').css('color','blue');
- 
- 	var appDescReg = /^[0-9a-zA-Z\u4e00-\u9faf]{0,100}$/;
+
+ 	var appDescReg = /^[0-9a-zA-Z,.?。，？、()'‘’”“":：*@#$%^&*-|\/\u4e00-\u9faf]{0,100}$/;
 	if(!appDescReg.test(appDesc)){
+		$('#appDescMsg').text('应用描述最长100个字符!');
 		$('#appDescMsg').css('color','red');
 		$('#appDesc').focus();
 		return false;
 	}
+	
 	$('#appDescMsg').text('输入正确！');
 	$('#appDescMsg').css('color','blue');
  	
@@ -936,7 +949,7 @@ cursors[1] = '';
 var total = 0;
 
 // 分页条更新
-function updateChatroomPageStatus(){
+function updateChatroomPageStatus(appUuid){
 	var pageLi = $('#pagina').find('li');
 	
 	// 获取token
@@ -955,7 +968,6 @@ function updateChatroomPageStatus(){
 				'Content-Type':'application/json'
 			},
 			error: function(respData, textStatus, jqXHR) {
-				//alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success: function(respData, textStatus, jqXHR) {
 				total = respData.count;
@@ -1000,10 +1012,122 @@ function updateUsersPageStatus(){
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				//alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success: function(respData, textStatus, jqXHR) {
 				total = respData.count;
+				var totalPage = (total % 10 == 0) ? (parseInt(total / 10)) : (parseInt(total / 10) + 1);
+				
+				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
+				var ulB = '<ul>';
+				var ulE = '</ul>';
+				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
+				var textOp2 = '<li> <a href="javascript:void(0);" onclick="getNextAppUserList();">下一页</a> </li>';
+				$('#paginau').html('');
+				// 首页
+				if(pageNo == 1){
+					if(totalPage == 1){
+						//$(pageLi[0]).hide();
+						//$(pageLi[1]).hide();
+						$('#paginau').append(ulB + ulE);
+					} else {
+						$('#paginau').append(ulB + textOp2 + ulE);
+						//$(pageLi[0]).hide();
+						//$(pageLi[1]).show();
+					}
+					// 尾页
+				} else if(totalPage ==  pageNo){
+					$('#paginau').append(ulB + textOp1 + ulE);
+					//$(pageLi[0]).show();
+					//$(pageLi[1]).hide();
+				} else {
+					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
+					//$(pageLi[0]).show();
+					//$(pageLi[1]).show();
+				}
+			}
+		});
+	}
+}
+
+// 管理员分页条更新
+function updateUsersAdminPageStatus(){
+	var pageLi = $('#paginau').find('li');
+	
+	// 获取token
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid +'/roles/admin/users?limit=1000',
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			},
+			success: function(respData, textStatus, jqXHR) {
+				total = respData.entities.length;
+				var totalPage = (total % 10 == 0) ? (parseInt(total / 10)) : (parseInt(total / 10) + 1);
+				
+				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
+				var ulB = '<ul>';
+				var ulE = '</ul>';
+				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
+				var textOp2 = '<li> <a href="javascript:void(0);" onclick="getNextAppUserList();">下一页</a> </li>';
+				$('#paginau').html('');
+				// 首页
+				if(pageNo == 1){
+					if(totalPage == 1){
+						//$(pageLi[0]).hide();
+						//$(pageLi[1]).hide();
+						$('#paginau').append(ulB + ulE);
+					} else {
+						$('#paginau').append(ulB + textOp2 + ulE);
+						//$(pageLi[0]).hide();
+						//$(pageLi[1]).show();
+					}
+					// 尾页
+				} else if(totalPage ==  pageNo){
+					$('#paginau').append(ulB + textOp1 + ulE);
+					//$(pageLi[0]).show();
+					//$(pageLi[1]).hide();
+				} else {
+					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
+					//$(pageLi[0]).show();
+					//$(pageLi[1]).show();
+				}
+			}
+		});
+	}
+}
+// 好友分页条更新
+function updateIMPageStatus(owner_username){
+	var pageLi = $('#paginau').find('li');
+	
+	// 获取token
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/'+owner_username+'/contacts/users?limit=1000',
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			},
+			success: function(respData, textStatus, jqXHR) {
+				total = respData.entities.length;
 				var totalPage = (total % 10 == 0) ? (parseInt(total / 10)) : (parseInt(total / 10) + 1);
 				
 				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
@@ -1058,7 +1182,6 @@ function getAppList(){
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success: function(respData, textStatus, jqXHR) {
 				var appData = jQuery.parseJSON(JSON.stringify(respData.data));
@@ -1079,7 +1202,6 @@ function getAppList(){
 							'Content-Type':'application/json'
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
-							alert('提示\n\n数据获取失败!');
 						},
 						success: function(respData, textStatus, jqXHR) {
 							$.each(respData.counters,function(){
@@ -1129,7 +1251,6 @@ function deleteApp(appUuid){
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success: function(respData, textStatus, jqXHR) {
 				alert('提示\n\napp删除成功!');
@@ -1158,7 +1279,6 @@ function getAppProfile(appUuid){
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				//alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success: function(respData, textStatus, jqXHR) {
 				$(respData.entities).each(function(){
@@ -1170,6 +1290,14 @@ function getAppProfile(appUuid){
 					var organizationName = this.organizationName;
 					var allowOpen = this.allow_open_registration?'开放注册':'授权注册';
 					var tag = this.allow_open_registration?'0':'1';
+					var image_thumbnail_width = '100';
+					if(this.image_thumbnail_width != null && this.image_thumbnail_width != undefined){
+						image_thumbnail_width = this.image_thumbnail_width;
+						}
+					var image_thumbnail_height = '100';
+					if(this.image_thumbnail_height != null && this.image_thumbnail_height!= undefined){
+						image_thumbnail_height=this.image_thumbnail_height;
+					}
 					$('#appKey').text(organizationName+'#'+applicationName);
 					$('#xmlandroidAppkey').text(organizationName+'#'+applicationName);
 					//$('#xmliosAppkey').text(organizationName+'#'+applicationName);
@@ -1177,6 +1305,8 @@ function getAppProfile(appUuid){
 					$('#modified').text(modified);
 					$('#allowOpen').text(allowOpen);
 					$('#allowOpenHdd').val(tag);
+					$('#image_thumbnail_width').text(image_thumbnail_width+'px');
+					$('#image_thumbnail_height').text(image_thumbnail_height+'px');
 				});
 				
 				$('#showName').text(respData.applicationName);
@@ -1185,6 +1315,7 @@ function getAppProfile(appUuid){
 		
 		// 获取app credential
 		//http://a1.easemob.com:80/management/organizations/belo/applications/myapptest/credentials
+		
 		$.ajax({
 			url: baseUrl + '/' + orgName + '/' + appUuid + '/credentials',
 			type:'GET',
@@ -1193,11 +1324,49 @@ function getAppProfile(appUuid){
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				//alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success: function(respData, textStatus, jqXHR) {
 				$('#client_id').text(respData.credentials.client_id);
 				$('#client_secret').text(respData.credentials.client_secret);
+			}
+		});
+		
+	}
+}
+
+
+//修改缩略图大小
+function updateImage(appUuid){
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	var imgReg =  /^[0-9]*$/;
+	var imgwidth = $('#imageWidth').val();
+	var imgheight = $('#imageHeight').val();
+	if(!imgReg.test(imgheight)){
+		alert('缩略图长宽格式不对!');
+	}else if(!imgReg.test(imgwidth)){
+		alert('缩略图长宽格式不对!');
+	}else{
+		
+		var d ={
+			image_thumbnail_width:parseInt(imgwidth), 
+			image_thumbnail_height:parseInt(imgheight)
+		};
+		$.ajax({
+			url: baseUrl + '/' + orgName + '/' + appUuid ,
+			type:'PUT',
+			data:JSON.stringify(d),
+			headers:{
+				'Authorization':'Bearer ' + access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert('修改失败!');
+			},
+			success: function(respData, textStatus, jqXHR) {
+				alert('修改成功!');
+				location.replace(location.href);
 			}
 		});
 	}
@@ -1221,7 +1390,6 @@ function getAppProfileforAppAdmin(appUuid){
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				//alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
 			},
 			success: function(respData, textStatus, jqXHR) {
 				$(respData.entities).each(function(){
@@ -1423,10 +1591,28 @@ function saveNewAppAdmin(appUuid){
 }
 
 //===================================================== User ==================================================================================
+
+function selectAppUser(sel,appUuid,username){
+		var value = sel.value;
+		
+		if(value == 'appIMList'){
+			toAppIMList(username);
+		}else if(value == 'setUsername'){
+			setUsername(appUuid, username);
+		}else if(value == 'sendMsg'){
+			sendMessgeOne(appUuid, username);
+		}else if(value == 'deleteUAdmin'){
+			deleteAppUser(appUuid, username);
+		}else if(value == 'excute'){
+			excute(appUuid, username);
+		}
+}
+
 // 获取某个app下的用户
 function getAppUserList(appUuid, pageAction){
 
 	// 获取token
+	$('#paginau').html('');
 	var access_token = $.cookie('access_token');
 	var cuser = $.cookie('cuser');
 	var orgName = $.cookie('orgName');
@@ -1434,6 +1620,7 @@ function getAppUserList(appUuid, pageAction){
 		alert('提示\n\n会话已失效,请重新登录!');
 		window.location.href = 'login.html';
 	} else {
+		var userPage = $.cookie('userPage');
 		if('next' == pageAction){
 			pageNo += 1;
 		} else if('forward' == pageAction){
@@ -1443,7 +1630,6 @@ function getAppUserList(appUuid, pageAction){
 		if(typeof(pageAction)!='undefined' && pageAction != ''){	
 			temp = '&cursor='+cursors[pageNo];
 		}
-		
 		$.ajax({
 			url:baseUrl+'/'+ orgName +'/' + appUuid + '/users?limit=10' + temp,
 			type:'GET',
@@ -1462,24 +1648,97 @@ function getAppUserList(appUuid, pageAction){
 						cursors[pageNo+1] = null;
 					}
 				}
-				
-				$('tbody').html('');
-				$(respData.entities).each(function(){
-					var username = this.username;
-					var created = format(this.created);
-					var option = '<tr>'+
-								'<td class="text-center">'+username+'</td>'+
-							 	'<td class="text-center">'+created+'</td>'+
-							 	'<td class="text-center"><a href="#passwordMondify" id="passwdMod${status.index }" onclick="setUsername(\'' + appUuid + '\',\''+ username +'\');" data-toggle="modal" role="button" class="btn btn-mini btn-info">重置密码</a>'+
-							 	' | <a  class="btn btn-mini btn-info" href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a></td>'+
-					 		'</tr>';
-					$('#appUserBody').append(option);
-				});
-				
+				if(respData.entities.length ==0 && pageAction == 'no'){
+					getAppUserList(appUuid,'forward' );
+				}else{
+					$('tbody').html('');
+					$(respData.entities).each(function(){
+						var username = this.username;
+						var created = format(this.created);
+						var notification_display_style='';
+						if(this.notification_display_style == 0){
+							notification_display_style='仅通知';
+						}else if(this.notification_display_style == 1){
+							notification_display_style='发送详情';
+						}
+						var nickname = this.nickname;
+						if(nickname == undefined){
+							nickname='';
+						}
+						var notification_no_disturbing=this.notification_no_disturbing;
+						if(this.notification_no_disturbing){
+							var notification_no_disturbing='已开启';
+							var notification_no_disturbing_time = this.notification_no_disturbing_start + ':00'+'--'+this.notification_no_disturbing_end + ':00';
+						}else{
+							var notification_no_disturbing='未开启';
+							var notification_no_disturbing_time='----';
+						}
+						var notifier_name = this.notifier_name;
+						if(notifier_name == undefined){
+							notifier_name='';
+						}
+						var userAdmin = '';
+						var excute = '';
+						var user_name_show = '';
+						$.ajax({
+							async: false, 
+							url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/'+username+'/roles',
+							type:'GET',
+							headers:{
+								'Authorization':'Bearer '+access_token,
+								'Content-Type':'application/json'
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+							},
+							success: function(respData, textStatus, jqXHR) {
+								if(respData.entities.length != 0){
+									if(respData.entities[0].roleName == 'admin'){
+										userAdmin = '撤销管理员';
+										excute = 'deleteUserAdmin';
+										user_name_show = '<span title="管理员"><font color ="red">'+username+'</font>&nbsp;&nbsp;<i class="icon-flag"></i></span>'
+									}
+								}else{
+									userAdmin = '设置管理员';
+									excute = 'setUserAdmin';
+									user_name_show = username;
+								}
+							}
+							
+						});
+								
+								// 20170802 李伟 add
+								var selectOptions = '<tr>'+
+									'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+username+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
+									'<td class="text-center">'+user_name_show+'</td>'+
+									'<td class="text-center">'+notification_display_style+'</td>'+
+									'<td class="text-center">'+nickname+'</td>'+
+									'<td class="text-center">'+notification_no_disturbing+'</td>'+
+									'<td class="text-center">'+notification_no_disturbing_time+'</td>'+
+									'<td class="text-center">'+notifier_name+'</td>'+
+									'<td class="text-center">'+created+'</td>'+
+									'<td class="text-center">'+
+										'<ul class="nav-pills" style="list-style-type:none">'+
+										'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+											'<ul class="dropdown-menu">'+
+										'<li data-filter-camera-type="all"><a href="javascript:toAppIMList(\''+username+'\')">查看用户好友</a></li>'+
+										  '<li data-filter-camera-type="Alpha"><a href="#passwordMondify" id="passwdMod${status.index }" onclick="setUsername(\'' + appUuid + '\',\''+ username +'\');" data-toggle="modal" role="button">重置密码</a></li>'+
+										  '<li data-filter-camera-type="Zed"><a href="javascript:showUpdateInfo(\''+appUuid+'\',\''+username+'\')">修改信息</a></li>'+
+										  '<li data-filter-camera-type="Zed"><a href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a></li>'+
+										  '<li data-filter-camera-type="Zed"><a href="javascript:sendMessgeOne(\''+appUuid+'\',\''+username+'\')">发送消息</a></li>'+
+										  '<li data-filter-camera-type="Bravo"><a href="javascript:'+excute+'(\''+appUuid+'\',\''+username+'\')">'+userAdmin+'</a></li>'+
+											'</ul>'+
+										'</li>'+
+									'</ul>'+
+									'</td>'+
+								'</tr>';
+								
+						$('#appUserBody').append(selectOptions);
+					});
+				}
 				// 无数据
 				var tbody = document.getElementsByTagName("tbody")[0];
 				if(!tbody.hasChildNodes()){
-					var option = '<tr><td class="text-center" colspan="7">无数据!</td></tr>';
+					var option = '<tr><td class="text-center" colspan="9">无数据!</td></tr>';
 					$('#appUserBody').append(option);
 					var pageLi = $('#paginau').find('li');
 					for(var i=0;i<pageLi.length;i++){
@@ -1493,6 +1752,177 @@ function getAppUserList(appUuid, pageAction){
 	}
 }
 
+//弹出修改信息框
+function showUpdateInfo(appUuid, username){
+	// 获取token
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	
+	if(!access_token || access_token=='') {
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'index.html';
+	} else {
+		$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/' + username,
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			},
+			success: function(respData, textStatus, jqXHR) {
+				$(respData.entities).each(function(){
+					var username = this.username;
+					var notification_display_style = this.notification_display_style;
+					var nickname = this.nickname;
+					var notification_no_disturbing=this.notification_no_disturbing;
+					var notification_no_disturbing_start = this.notification_no_disturbing_start;
+					var notification_no_disturbing_end = this.notification_no_disturbing_end ;
+					$('#username').text(username);
+					document.getElementById('messageType_0').checked=false;
+					document.getElementById('messageType_1').checked=false;
+					if(notification_display_style == 0){
+						document.getElementById('messageType_0').checked='checked';
+					}else if(notification_display_style == 1){
+						document.getElementById('messageType_1').checked='checked';
+					}
+					$('#nickname').val(nickname);
+					document.getElementById('notification_true').checked=false;	
+					document.getElementById('notification_false').checked=false;	
+					if(notification_no_disturbing){
+						document.getElementById('notification_true').checked='checked';	
+						document.getElementById('notification_time_div').style.display="block";
+						$('#notification_starttime').val(notification_no_disturbing_start);
+						$('#notification_endtime').val(notification_no_disturbing_end);
+					}else if(!notification_no_disturbing){
+						document.getElementById('notification_false').checked='checked';	
+						document.getElementById('notification_time_div').style.display="none";
+						$('#notification_starttime').val('');
+						$('#notification_endtime').val('');
+					}
+					$('#showUpdateInfoA').click();
+				});
+			}
+		});
+	}
+}
+
+//修改信息
+function updateInfo(appUuid){
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	var username =$('#username').text();
+	var notification_display_style;
+	if(document.getElementById('messageType_0').checked){
+		notification_display_style = 0;
+	}else if(document.getElementById('messageType_1').checked){
+		notification_display_style = 1;
+	}else{
+		notification_display_style = '';
+	}
+	var nickname =$('#nickname').val();
+	var notification_no_disturbing;
+	var notification_no_disturbing_start;
+	var notification_no_disturbing_end;
+	if(document.getElementById('notification_true').checked){
+		notification_no_disturbing = true;
+		notification_no_disturbing_start = $('#notification_starttime').val();
+		notification_no_disturbing_end = $('#notification_endtime').val();
+	}else if(document.getElementById('notification_false').checked){
+		notification_no_disturbing = false;
+		notification_no_disturbing_start = '';
+		notification_no_disturbing_end = '';
+	}else{
+		
+	}
+	var flag = true;
+	if(nickname.length>20){
+		flag =false;
+	}
+	
+	if(document.getElementById('notification_true').checked){
+		var numReg = /^[0-9]*$/;
+		//var numReg = /^(([01]?[0-9])|(2[0-3])):[0-5]?[0-9]$/;
+		if(numReg.test(notification_no_disturbing_start) && numReg.test(notification_no_disturbing_end)){
+			
+			notification_no_disturbing_end = parseInt(notification_no_disturbing_end);
+			notification_no_disturbing_start = parseInt(notification_no_disturbing_start);
+			
+			if(notification_no_disturbing_end>=0 && notification_no_disturbing_end<=23&&notification_no_disturbing_start>=0&&notification_no_disturbing_start<=23&&notification_no_disturbing_end>notification_no_disturbing_start){
+				var d ={
+					notification_display_style : notification_display_style,
+					nickname : nickname,
+					notification_no_disturbing :  notification_no_disturbing,
+					notification_no_disturbing_start : notification_no_disturbing_start,
+					notification_no_disturbing_end : notification_no_disturbing_end
+				};
+				if(flag){
+					$.ajax({
+							url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/' + username,
+							type:'PUT',
+							headers:{
+								'Authorization':'Bearer '+access_token,
+								'Content-Type':'application/json'
+							},
+							data:JSON.stringify(d),
+							error: function(jqXHR, textStatus, errorThrown) {
+								alert('修改失败!');
+							},
+							success: function(respData, textStatus, jqXHR) {
+								alert('修改成功!');
+								$('#infoCloseButn').click();
+								getAppUserList(appUuid,'no');
+							}
+					});
+				}else{
+					alert('昵称不能超过20个字符!');	
+				}
+			}else{
+				alert('时间格式不正确，请输入0 ~ 23！');
+			}
+			
+		}else{
+			alert('时间格式不正确，请输入0 ~ 23！');
+		}
+		
+	}else if(!document.getElementById('notification_true').checked){
+		var d ={
+				notification_display_style : notification_display_style,
+				nickname : nickname,
+				notification_no_disturbing :  notification_no_disturbing,
+				notification_no_disturbing_start : notification_no_disturbing_start,
+				notification_no_disturbing_end : notification_no_disturbing_end
+				};
+				if(flag){
+					$.ajax({
+							url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/' + username,
+							type:'PUT',
+							headers:{
+								'Authorization':'Bearer '+access_token,
+								'Content-Type':'application/json'
+							},
+							data:JSON.stringify(d),
+							error: function(jqXHR, textStatus, errorThrown) {
+								alert('修改失败!');
+							},
+							success: function(respData, textStatus, jqXHR) {
+								alert('修改成功!');
+								$('#infoCloseButn').click();
+								getAppUserList(appUuid,'no');
+							}
+					});
+				}else{
+					alert('昵称不能超过20个字符!');	
+				}
+		
+	}
+
+}
+
+
 // 搜索IM用户
 function searchUser(appUuid, queryString){
 	// 获取token
@@ -1502,7 +1932,7 @@ function searchUser(appUuid, queryString){
 	
 	if(!access_token || access_token=='') {
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		
 		$.ajax({
@@ -1514,23 +1944,115 @@ function searchUser(appUuid, queryString){
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				$('tbody').html('');
-				var option = '<tr><td class="text-center" colspan="7">用户不存在!</td></tr>';
+				var option = '<tr><td class="text-center" colspan="9">用户不存在!</td></tr>';
 				$('#appUserBody').append(option);
 				$('#paginau').hide();
 			},
 			success: function(respData, textStatus, jqXHR) {
 				$('tbody').html('');
-				
 				$(respData.entities).each(function(){
 					var username = this.username;
 					var created = format(this.created);
+					var notification_display_style='';
+					if(this.notification_display_style == 0){
+						notification_display_style='仅通知';
+					}else if(this.notification_display_style == 1){
+						notification_display_style='发送详情';
+					}
+					var nickname = this.nickname;
+					if(nickname == undefined){
+						nickname='';
+					}
+					var notification_no_disturbing=this.notification_no_disturbing;
+					if(this.notification_no_disturbing){
+
+						var notification_no_disturbing='已开启';
+						var notification_no_disturbing_time = this.notification_no_disturbing_start + ':00'+'--'+this.notification_no_disturbing_end + ':00';
+					}else{
+						var notification_no_disturbing='未开启';
+						var notification_no_disturbing_time='----';
+					}
+					var notifier_name = this.notifier_name;
+					if(notifier_name == undefined){
+						notifier_name='';
+					}
+					var userAdmin = '';
+					var excute = '';
+					var user_name_show = '';
+					$.ajax({
+						async: false, 
+						url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/'+username+'/roles',
+						type:'GET',
+						headers:{
+							'Authorization':'Bearer '+access_token,
+							'Content-Type':'application/json'
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+						},
+						success: function(respData, textStatus, jqXHR) {
+							if(respData.entities.length != 0){
+								if(respData.entities[0].roleName == 'admin'){
+									userAdmin = '撤销管理员';
+									excute = 'deleteUserAdmin';
+									user_name_show = '<span title="管理员"><font color ="red">'+username+'</font>&nbsp;&nbsp;<i class="icon-flag"></i></span>'					}
+							}else{
+								userAdmin = '设置管理员';
+								excute = 'setUserAdmin';
+								user_name_show = username;
+							}
+						}
+						
+					});
+					
 					var option = '<tr>'+
-								'<td class="text-center">'+username+'</td>'+
+								'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+username+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
+								'<td class="text-center">'+user_name_show+'</td>'+																'<td class="text-center">'+notification_display_style+'</td>'+
+								'<td class="text-center">'+nickname+'</td>'+
+								'<td class="text-center">'+notification_no_disturbing+'</td>'+
+								'<td class="text-center">'+notification_no_disturbing_time+'</td>'+
+								'<td class="text-center">'+notifier_name+'</td>'+
 							 	'<td class="text-center">'+created+'</td>'+
-							 	'<td class="text-center"><a href="#passwordMondify" id="passwdMod${status.index }" onclick="setUsername(\'' + appUuid + '\',\''+ username +'\');" data-toggle="modal" role="button" class="btn btn-mini btn-info">重置密码</a>'+
-							 	' | <a  class="btn btn-mini btn-info" href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a></td>'+
+							 	'<td class="text-center"><a href="javascript:toAppIMList(\''+username+'\')" class="btn btn-mini btn-info">查看用户好友</a>'+
+							 	' | <a href="#passwordMondify" id="passwdMod${status.index }" onclick="setUsername(\'' + appUuid + '\',\''+ username +'\');" data-toggle="modal" role="button" class="btn btn-mini btn-info">重置密码</a>'+
+							 	' | <a  class="btn btn-mini btn-info" href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a>'+
+								' | <a  class="btn btn-mini btn-info" href="javascript:sendMessgeOne(\''+appUuid+'\',\''+username+'\')">发送消息</a>'+
+								' | <a  class="btn btn-mini btn-info" href="javascript:'+excute+'(\''+appUuid+'\',\''+username+'\')">'+userAdmin+'</a></td>'+
+								 //'<td class="text-center"><select id="select1" onchange="selectAppUser(this,\''+appUuid+'\',\''+username+'\')">'+
+                 //'<option value="操作">操作</option>'+
+                 //'<option value="appIMList">查看用户好友</option>'+
+								 //'<option value="setUsername">重置密码</option>'+
+								 //'<option value="sendMsg">发送消息</option>'+
+								 //'<option value="deleteUAdmin">撤销管理员</option>'+
+						     //'</td>'+
 					 		'</tr>';
-					$('#appUserBody').append(option);
+					 		
+					 		// 20170802 李伟 add
+					 		var selectOptions = '<tr>'+
+								'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+username+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
+								'<td class="text-center">'+user_name_show+'</td>'+
+								'<td class="text-center">'+notification_display_style+'</td>'+
+								'<td class="text-center">'+nickname+'</td>'+
+								'<td class="text-center">'+notification_no_disturbing+'</td>'+
+								'<td class="text-center">'+notification_no_disturbing_time+'</td>'+
+								'<td class="text-center">'+notifier_name+'</td>'+
+							 	'<td class="text-center">'+created+'</td>'+
+							 	'<td class="text-center">'+
+									'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
+				    				'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+				    					'<ul class="dropdown-menu">'+
+					          		'<li data-filter-camera-type="all"><a href="javascript:toAppIMList(\''+username+'\')">查看用户好友</a></li>'+
+							          '<li data-filter-camera-type="Alpha"><a href="#passwordMondify" id="passwdMod${status.index }" onclick="setUsername(\'' + appUuid + '\',\''+ username +'\');" data-toggle="modal" role="button">重置密码</a></li>'+
+							          '<li data-filter-camera-type="Zed"><a href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a></li>'+
+							          '<li data-filter-camera-type="Zed"><a href="javascript:sendMessgeOne(\''+appUuid+'\',\''+username+'\')">发送消息</a></li>'+
+							          '<li data-filter-camera-type="Bravo"><a href="javascript:'+excute+'(\''+appUuid+'\',\''+username+'\')">'+userAdmin+'</a></li>'+
+							     		'</ul>'+
+							     	'</li>'+
+						     	'</ul>'+
+								'</td>'+
+					 		'</tr>';
+					 		
+					$('#appUserBody').append(selectOptions);
+					
 					$('#paginau').hide();
 				});
 			}
@@ -1544,6 +2066,131 @@ function setUsername(appUuid,username){
 	$('#pwdMondify').val('');
 }
 
+//弹出发送消息
+function sendMessge(appUuid){
+	var checkbox=document.getElementsByName("checkbox");
+	var num=0;
+	for (var i=0;i<checkbox.length;i++){
+		if(checkbox[i].checked){
+			num++;
+		}
+	}
+	if(num>0){
+	var users = new Array();
+		for (var i=0;i<checkbox.length;i++){
+			if(checkbox[i].checked){
+				users.push(checkbox[i].value);
+			}
+		}
+	$('#usernameMessage').val(users);
+	$('#appUuidMessage').val(appUuid);
+	$('#messegeContent').val('');
+	document.getElementById('messegeContent').style.display="block";
+	$('#img1').remove();
+	$('#share-secret').val('');
+	$('#file').val('');
+	$('#f_file').val('');
+	$('#sendMessageA').click();
+	}else{
+		alert('至少选择一个用户!');	
+	}
+}
+
+//单个消息发送
+function sendMessgeOne(appUuid,users){
+	$('#usernameMessage').val(users);
+	$('#appUuidMessage').val(appUuid);
+	$('#messegeContent').val('');
+	document.getElementById('messegeContent').style.display="block";
+	$('#img1').remove();
+	$('#share-secret').val('');
+	$('#file').val('');
+	$('#f_file').val('');
+	$('#sendMessageA').click();
+}
+
+//发送消息
+function sendUserMessage(){
+	var users = document.getElementById('usernameMessage').value;
+	var appUuid = document.getElementById('appUuidMessage').value;
+	var orgName = $.cookie('orgName');
+	var token = $.cookie('access_token');
+	var messageContent = $('#messegeContent').val().trim();
+	var target = users.split(',');
+	if ( messageContent ==''){
+		alert('消息不能为空');
+	}else{
+		var d = {
+		  "target_type" : "users", //or chatgroups
+		  "target" : target, //注意这里需要用数组, 即使只有一个用户, 也要用数组 ['u1']
+		  
+		  "msg" : {
+			  "type" : "txt",
+			  "msg" : messageContent //消息内容，参考[聊天记录](http://developer.easemob.com/docs/emchat/rest/chatmessage.html)里的bodies内容
+			  }
+		 }
+		 $.ajax({
+				url:baseUrl+'/'+ orgName + "/" + appUuid + '/messages',
+				type:'POST',
+				headers:{
+					'Authorization':'Bearer '+token,
+					'Content-Type':'application/json'
+				},	
+				data:JSON.stringify(d),
+				error:function(respData){
+	
+				},
+				success:function(respData){
+					$('#closeButn').click();
+					alert('发送成功');
+				}
+		 });
+	}
+	
+}
+//发送图片
+function sendUserImgMessage(){
+	if( $('#share-secret').val() == ''|| $('#share-secret').val() == null){
+		alert('请先选择图片');	
+	}else{
+		var users = document.getElementById('usernameMessage').value;
+		var appUuid = document.getElementById('appUuidMessage').value;
+		var orgName = $.cookie('orgName');
+		var token = $.cookie('access_token');
+		var messageContent = $('#messegeContent').val();
+		var target = users.split(',');
+		var str = $('#share-secret').val().split(',');
+		var d = {
+		  "target_type" : "users", //or chatgroups
+		  "target" : target, //注意这里需要用数组, 即使只有一个用户, 也要用数组 ['u1']
+		  
+		  "msg" : {
+			  "type" : "img",
+			  },
+		"filename":str[0],
+		"secret": str[1]
+		 }
+		 $.ajax({
+				url:baseUrl+'/'+ orgName + "/" + appUuid + '/messages',
+				type:'POST',
+				headers:{
+					'Authorization':'Bearer '+token,
+					'Content-Type':'application/json'
+				},	
+				data:JSON.stringify(d),
+				error:function(respData){
+
+				},
+				success:function(respData){
+					$('#closeButn').click();
+					alert('发送成功');
+				}
+		 });
+	}
+	
+}
+
+
 // 重置app用户密码
 function updateAppUserPassword(){
 	var username = $('#usernameMondify').val();
@@ -1553,7 +2200,7 @@ function updateAppUserPassword(){
 	var appUuid = $('#appUuidHidd').val();
 	
   var pwdMondifyVal = $('#pwdMondify').val();
-  var pwdMondifytwoVal = $('#pwdMondifytwo').val();
+  var pwdMondifytwoVal = $('#pwdMondifytwo').attr('value');
 	
 	var passwordReg = /^[0-9a-zA-Z]{1,100}$/;
   if(pwdMondifyVal == ''){
@@ -1624,10 +2271,55 @@ function deleteAppUser(appUuid,username){
 			},
 			success:function(respData){
 				alert('提示\n\n删除成功!');
-				window.location.href = 'app_users.html?appUuid='+appUuid;
+				getAppUserList(appUuid,'no');
 			}
 		});
 	}
+}
+//批量删除app下的用户
+function deleteAppUserCheckBox(appUuid){
+		var checkbox=document.getElementsByName("checkbox");
+		var num=0;
+		for (var i=0;i<checkbox.length;i++){
+			if(checkbox[i].checked){
+				num++;
+			}
+		}
+		if(num>0){
+			if(confirm('确定要删除这些用户吗?')){
+				for (var i=0;i<checkbox.length;i++){
+					if(checkbox[i].checked){
+						deleteAppUsers(appUuid,checkbox[i].value);
+					}
+				}
+				getAppUserList(appUuid);
+			}
+		}else{
+			alert('至少选择一个用户!');	
+		}
+}
+
+
+
+
+//调用方法
+function deleteAppUsers(appUuid,username){
+	var access_token = $.cookie('access_token');
+	var orgName = $.cookie('orgName');
+		$.ajax({
+			async: false, 
+			url:baseUrl + '/' + orgName +'/' + appUuid + '/users/' + username,
+			type:'DELETE',
+			headers:{
+				'Authorization':'Bearer ' + access_token,
+				'Content-Type':'application/json'
+			},		
+			error:function(){
+			},
+			success:function(respData){
+				
+			}
+		});
 }
 
 // 获取app群组列表
@@ -1650,16 +2342,15 @@ function getAppChatrooms(appUuid,pageAction){
 		if(typeof(pageAction)!='undefined' && pageAction != ''){	
 			tmp = '&cursor=' + cursors[pageNo];
 		}
-
 		$.ajax({
-			url:baseUrl+'/'+ orgName +'/' + appUuid + '/chatrooms?limit=10' + tmp,
+			url:baseUrl+'/'+ orgName + "/" + appUuid + '/chatgroups',
 			type:'GET',
 			headers:{
 				'Authorization':'Bearer '+access_token,
 				'Content-Type':'application/json'
 			},		
 			error:function(respData){
-				alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
+
 			},
 			success:function(respData){
 				// 缓存游标,下次next时候存新的游标
@@ -1668,32 +2359,200 @@ function getAppChatrooms(appUuid,pageAction){
 				} else {
 					cursors[pageNo+1] = null;
 				}
-				
 				$('tbody').html('');
-				$(respData.entities).each(function(){
-						var created = format(this.created);
-						var groupname = this.groupname;
-						var groupuuid = this.uuid;
-						var admin = this.admin;
-						var desc = this.desc;
-						var grouptype = this.grouptype;
-						if(this.grouptype == 'workgroup'){
-							grouptype = '工作组';
-						} else {
-							grouptype = '临时组';
-						}
-						var members = this.members;
+				$(respData.data).each(function(){
+					var groupid = this.groupid;
+					var groupname = this.groupname;
+					if(groupname == '' || groupname == null){
+						groupname = '-';
+					}
+					var nums = 0;
+					var admin='';
+					 /** $.ajax({  
+							url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +groupid+'/users',
+							async: false, 
+							type:'GET',
+							headers:{
+								'Authorization':'Bearer '+access_token,
+								'Content-Type':'application/json'
+							},		
+							error:function(respData){
+
+							},
+							success:function(respData){
+								nums = respData.data.length;
+								$(respData.data).each(function(){
+                     admin=this.owner
+							});
+								} 
+						    
+						});
+						*/
 						var option = '<tr>'+
-							'<td class="text-center">'+groupname+'</td>'+
-						 	'<td class="text-center">'+admin+'</td>'+
-					   	'<td class="text-center">'+members.length+'</td>'+
-						 	'<td class="text-center">'+desc+'</td>'+
-						 	'<td class="text-center">'+grouptype+'</td>'+
-						 	'<td class="text-center">'+created+'</td>'+
-						 	'<td class="text-center"><a href="javascript:deleteAppChatroom(\''+appUuid+'\',\''+groupuuid+'\')">删除</a></td>'+
-				 		'</tr>';
-						$('#appChatroomBody').append(option);
+							'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+groupid+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
+							'<td class="text-center">'+groupid+'</td>'+
+						 	//'<td class="text-center">'+admin+'</td>'+
+					   	//'<td class="text-center">'+nums+'</td>'+
+						 	'<td class="text-center">'+ groupname +'</td>'+
+							'<td class="text-center"><a href="javascript:togroupaddAppAdminuserusers(\''+appUuid+'\',\''+groupid+'\')" class="btn btn-mini btn-info">查看群组成员</a>'+
+							' | <a  class="btn btn-mini btn-info" href="javascript:deleteAppChatroom(\''+appUuid+'\',\''+groupid+'\')">删除</a>'+
+							' | <a  class="btn btn-mini btn-info" href="javascript:sendMessgeOne(\''+appUuid+'\',\''+groupid+'\')">发送消息</a></td>'+
+				 		  //'<td class="text-center"><select id="select1" onchange="selectFunqunzu(this,\''+appUuid+'\',\''+groupid+'\')">'+
+              //   '<option value="操作">操作</option>'+
+							//	 '<option value="查看群组成员">查看群组成员</option>'+
+							//	 '<option value="发送消息">发送消息</option>'+
+							//	 '<option value="删除">删除</option>'+
+						     //'</select></td>'+
+						'</tr>';
+						
+						var selectOptions = '<tr>'+
+							'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+groupid+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
+							'<td class="text-center">'+groupid+'</td>'+
+						 	'<td class="text-center">'+ groupname +'</td>'+
+							'<td class="text-center">'+
+								'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
+			    					'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+				    					'<ul class="dropdown-menu">'+
+						            '<li data-filter-camera-type="all"><a href="javascript:togroupaddAppAdminuserusers(\''+appUuid+'\',\''+groupid+'\')">查看群组成员</a></li>'+
+						            '<li data-filter-camera-type="Alpha"><a href="javascript:deleteAppChatroom(\''+appUuid+'\',\''+groupid+'\')">删除</a></li>'+
+						            '<li data-filter-camera-type="Zed"><a href="javascript:sendMessgeOne(\''+appUuid+'\',\''+groupid+'\')">发送消息</a></li>'+
+					     				'</ul>'+
+					     			'</li>'+
+				     		'</ul>'+
+							'</td>'+
+						'</tr>';
+						
+						$('#appChatroomBody').append(selectOptions);
 				});
+
+				var tbody = document.getElementsByTagName("tbody")[0];
+				if(!tbody.hasChildNodes()){
+					var option = '<tr><td class="text-center" colspan="7">无数据!</td></tr>';
+					$('#appChatroomBody').append(option);
+					var pageLi = $('#pagina').find('li');
+					for(var i=0;i<pageLi.length;i++){
+						$(pageLi[i]).hide();
+					}
+				} else {
+					//updateChatroomPageStatus(appUuid);	
+				}
+			}
+		});
+	}
+	
+}
+
+function selectFunqunzu(sel,appUuid,groupid){
+		var value=sel.value;
+		if(value == '查看群组成员'){
+			togroupaddAppAdminuserusers(appUuid,groupid);
+		}else if(value == '删除'){
+			deleteAppChatroom(appUuid,groupid);
+		}else if(value == '发送消息'){
+			sendMessgeOne(appUuid,groupid);
+		}
+}
+				
+// 搜索app群组列表
+function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
+	// 获取token
+	$('#paginau').html('');
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		if('forward' == pageAction){
+			pageNo += 1;
+		} else if('next' == pageAction){
+			pageNo -= 1;
+		}
+		
+		var tmp = '';
+		if(typeof(pageAction)!='undefined' && pageAction != ''){	
+			tmp = '&cursor=' + cursors[pageNo];
+		}
+		$.ajax({
+			url:baseUrl+'/'+ orgName + "/" + appUuid + '/chatgroups/'+qunzuid,
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},		
+			error:function(respData){
+				
+			},
+			success:function(respData){
+				// 缓存游标,下次next时候存新的游标
+				if(pageAction!='forward'){
+					cursors[pageNo+1] =	respData.cursor;
+				} else {
+					cursors[pageNo+1] = null;
+				}
+				$('tbody').html('');
+				var groupid = respData.data;
+				var groupname = this.groupname;
+				if(groupname == '' || groupname == null){
+					groupname = '-';
+				}
+				
+				var nums = 0;
+				var admin='';
+			  $.ajax({  
+					url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +qunzuid+'/users',
+					async: false, 
+					type:'GET',
+					headers:{
+						'Authorization':'Bearer '+access_token,
+						'Content-Type':'application/json'
+					},		
+					error:function(respData){
+				
+					},
+					success:function(respData){
+						
+						nums = respData.data.length;
+						$(respData.data).each(function(){
+              admin = this.owner
+					});
+					} 
+				    
+				});
+					
+				var option = '<tr>'+
+					'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+groupid+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
+					'<td class="text-center">'+groupid+'</td>'+
+					'<td class="text-center">'+groupname+'</td>'+
+					//'<td class="text-center">'+nums+'</td>'+
+					//'<td class="text-center"></td>'+
+					//'<td class="text-center"></td>'+
+					//'<td class="text-center"></td>'+
+					'<td class="text-center"><a href="javascript:togroupaddAppAdminuserusers(\''+appUuid+','+groupid+'\')" class="btn btn-mini btn-info">查看群组成员</a>'+
+					' | <a  class="btn btn-mini btn-info" href="javascript:deleteAppChatroom(\''+appUuid+'\',\''+groupid+'\')">删除</a>'+
+					' | <a  class="btn btn-mini btn-info" href="javascript:sendMessgeOne(\''+appUuid+'\',\''+groupid+'\')">发送消息</a></td>'+
+				'</tr>';
+
+
+				var selectOptions = '<tr>'+
+							'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+groupid+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
+							'<td class="text-center">'+groupid+'</td>'+
+						 	'<td class="text-center">'+ groupname +'</td>'+
+							'<td class="text-center">'+
+								'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
+			    					'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+				    					'<ul class="dropdown-menu">'+
+						            '<li data-filter-camera-type="all"><a href="javascript:togroupaddAppAdminuserusers(\''+appUuid+'\',\''+groupid+'\')">查看群组成员</a></li>'+
+						            '<li data-filter-camera-type="Alpha"><a href="javascript:deleteAppChatroom(\''+appUuid+'\',\''+groupid+'\')">删除</a></li>'+
+						            '<li data-filter-camera-type="Zed"><a href="javascript:sendMessgeOne(\''+appUuid+'\',\''+groupid+'\')">发送消息</a></li>'+
+					     				'</ul>'+
+					     			'</li>'+
+				     		'</ul>'+
+							'</td>'+
+						'</tr>';
+						
+				$('#appChatroomBody').append(selectOptions);
 				
 				var tbody = document.getElementsByTagName("tbody")[0];
 				if(!tbody.hasChildNodes()){
@@ -1704,14 +2563,123 @@ function getAppChatrooms(appUuid,pageAction){
 						$(pageLi[i]).hide();
 					}
 				} else {
-					updateChatroomPageStatus();	
+					updateChatroomPageStatus(appUuid);	
 				}
 			}
 		});
 	}
 	
 }
-
+// 查看群组成员
+function togroupaddAppAdminuserusers(appUuid,groupid){
+	window.location.href = 'app_qunzu_list.html?appUuid=' + appUuid + '&groupid=' + groupid;
+}
+	
+// 获取群组成员列表
+function getAppChatroomsuser(appUuid,groupid,pageAction){
+	// 获取token
+	$('#paginau').html('');
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		if('forward' == pageAction){
+			pageNo += 1;
+		} else if('next' == pageAction){
+			pageNo -= 1;
+		}
+		
+		var tmp = '';
+		if(typeof(pageAction)!='undefined' && pageAction != ''){	
+			tmp = '&cursor=' + cursors[pageNo];
+		}
+		$.ajax({
+			url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +groupid+'/users',
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},		
+			error:function(respData){
+				
+			},
+			success:function(respData){
+				// 缓存游标,下次next时候存新的游标
+				if(pageAction!='forward'){
+					cursors[pageNo+1] =	respData.cursor;
+				} else {
+					cursors[pageNo+1] = null;
+				}
+				if(respData.entities.length ==0 && pageAction == 'no'){
+					getAppChatroomsuser(appUuid,groupid,'forward' );
+				}else{
+					$('#showName').text(respData.applicationName);
+					$('#showUsername').text(cuser)
+						
+					$('tbody').html('');
+					//var i=0;
+					$(respData.data).each(function(){
+						
+						var members = this.member;
+						var owner=this.owner;
+						if(members != undefined){
+							
+							// 20170802 李伟 add
+							var selectOptions = '<tr>'+
+								'<td class="text-center">'+members+'</td>'+
+								'<td class="text-center">'+
+									'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
+									'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+										'<ul class="dropdown-menu" style="left:200px">'+
+									'<li><a href="javascript:deleteAppChatroomUsers(\''+appUuid+'\',\''+groupid+'\',\''+members+'\')">移除</a></li>'+
+										'</ul>'+
+									'</li>'+
+								'</ul>'+
+								'</td>'+
+							'</tr>';
+							$('#appIMBody').append(selectOptions);
+							
+						}else if(owner !=undefined){
+							$.cookie('owner',owner);
+							
+							// 20170802 李伟 add
+							var selectOptions = '<tr>'+
+								'<td class="text-center">'+owner+'</td>'+
+								'<td class="text-center">'+
+									'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
+									'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+										'<ul class="dropdown-menu" style="left:200px">'+
+									'<li><a href="javascript:deleteAppChatroomUsers(\''+appUuid+'\',\''+groupid+'\',\''+members+'\')">移除</a></li>'+
+										'</ul>'+
+									'</li>'+
+								'</ul>'+
+								'</td>'+
+							'</tr>';
+							
+							$('#appIMBody').append(selectOptions);
+						}
+							//i++;
+					});
+				}
+				var tbody = document.getElementsByTagName("tbody")[0];
+				if(!tbody.hasChildNodes()){
+					var option = '<tr><td class="text-center" colspan="7">无数据!</td></tr>';
+					$('#appIMBody').append(option);
+					var pageLi = $('#pagina').find('li');
+					for(var i=0;i<pageLi.length;i++){
+						$(pageLi[i]).hide();
+					}
+				} else {
+					updateChatroomPageStatus(appUuid);	
+				}
+			}
+		});
+	}
+	
+}
 // 删除app下的群组
 function deleteAppChatroom(appUuid,groupuuid){
 	var access_token = $.cookie('access_token');
@@ -1719,7 +2687,7 @@ function deleteAppChatroom(appUuid,groupuuid){
 	
 	if(confirm('确定要删除此群组吗?')){
 		$.ajax({
-			url:baseUrl + '/' + orgName +'/' + appUuid + '/chatrooms/' + groupuuid,
+			url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' + groupuuid,
 			type:'DELETE',
 			headers:{
 				'Authorization':'Bearer ' + access_token,
@@ -1730,57 +2698,299 @@ function deleteAppChatroom(appUuid,groupuuid){
 			},
 			success:function(respData){
 				alert('提示\n\n删除成功!');
-				window.location.href = 'app_chatrooms.html?appUuid='+appUuid;
+				window.location.href = 'app_group.html?appUuid='+appUuid;
 			}
 		});
 	}
 }
-
-//============================================================证书 ========================================================================
-// 上传证书
-
-
-
-// 查询证书信息
-function getAppCredentials(appUuid){
+// 移除群组下的成员
+function deleteAppChatroomUsers(appUuid,groupuuid,usersname){
 	var access_token = $.cookie('access_token');
 	var orgName = $.cookie('orgName');
-	$.ajax({
-			url:baseUrl+'/'+ orgName +'/' + appUuid + '/notifiers',
+	
+	if(confirm('确定要把该成员移除此群组吗?')){
+		//alert(baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +groupuuid+'/users/'+usersname);
+		$.ajax({
+			url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +groupuuid+'/users/'+usersname,
+			type:'DELETE',
+			headers:{
+				'Authorization':'Bearer ' + access_token,
+				'Content-Type':'application/json'
+			},
+			error:function(){
+				alert('提示\n\n移除失败!');
+			},
+			success:function(respData){
+				alert('提示\n\n移除成功!');
+				location.replace(location.href);
+			}
+		});
+	}
+}
+//添加群内成员
+function addIMFriendusers(){
+	var orgName = $.cookie('orgName');
+	var access_token = $.cookie('access_token');
+	var owner_username = $('#usernameFriend').val();
+	var appUuid = $('#appUuidFriend').val();
+	var friend_username = $('#friendUsername').val();
+	if (friend_username == ''){
+		alert('好友名称不能为空!');	
+	}else{
+		$.ajax({
+				url:baseUrl+'/'+ orgName +'/' + appUuid +'/users/' + friend_username,
+				type:'POST',
+				headers:{
+					'Authorization':'Bearer '+access_token,
+					'Content-Type':'application/json'
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert('提示\n\n该用户不存在，请检查用户名!');
+				},
+				success: function(respData, textStatus, jqXHR) {
+					var owner = $.cookie('owner');
+					if(friend_username != owner){
+					
+					$.ajax({
+						url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +owner_username+'/users/'+friend_username,
+						type:'POST',
+						headers:{
+							'Authorization':'Bearer '+access_token,
+							'Content-Type':'application/json'
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							
+						},
+						success: function(respData, textStatus, jqXHR) {
+							alert('添加好友成功!');
+							location.replace(location.href);
+						}
+					});
+					}else{
+						alert('该用户已经是管理员不能添加!');	
+					}
+				}
+		});
+	
+		
+	}
+	
+}
+//添加群组
+function addqunzuFriendusers(appUuid,qunzuname,qunzumiaosu,approval,publics,qunzuguan){
+	var orgName = $.cookie('orgName');
+	var access_token = $.cookie('access_token');
+	var owner_username = $('#usernameFriend').val();
+	//var appUuid = $('#appUuidFriend').val();
+	var friend_username = $('#friendUsername').val();
+	var qun={
+    "groupname":qunzuname,
+    "desc":qunzumiaosu, 
+    "public":publics, 
+   // "approval":approval, 
+    "owner":qunzuguan
+}; 
+	if(publics==true){
+       qun.approval=approval;
+	}
+	if (qunzuname == ''){
+		alert('群组名称不能为空!');	
+	}else if(qunzumiaosu==''){
+	    alert('群组描述不能为空');
+	}else if(qunzuguan==''){
+	    alert('群组管理员不能为空');
+	}else{
+		$.ajax({
+				url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups',
+				type:'POST',
+			    data:JSON.stringify(qun),
+				headers:{
+					'Authorization':'Bearer '+access_token,
+					'Content-Type':'application/json'
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert('提示\n\n该用户不存在，请检查用户名!');
+				},
+				success: function(respData, textStatus, jqXHR) {
+					location.replace(location.href);
+				}
+		});
+	
+		
+	}
+	
+}
+// 批量删除app下的群组的Ajax
+function deleteAppChatrooms(appUuid,groupuuid){
+	var access_token = $.cookie('access_token');
+	var orgName = $.cookie('orgName');
+		$.ajax({
+			async: false, 
+			url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' + groupuuid,
+			type:'DELETE',
+			headers:{
+				'Authorization':'Bearer ' + access_token,
+				'Content-Type':'application/json'
+			},
+			error:function(){
+			},
+			success:function(respData){
+			}
+		});
+	
+}
+//批量删除app下的群组调用
+function deleteAppqunzuCheckBox(appUuid){
+		var checkbox=document.getElementsByName("checkbox");
+		var num=0;
+		for (var i=0;i<checkbox.length;i++){
+			if(checkbox[i].checked){
+				num++;
+			}
+		}
+		if(num>0){
+			if(confirm('确定要删除这些q群组吗?')){
+				for (var i=0;i<checkbox.length;i++){
+					if(checkbox[i].checked){
+						deleteAppChatrooms(appUuid,checkbox[i].value);
+					}
+				}
+				location.replace(location.href);
+			}
+		}else{
+			alert('至少选择一个用户!');	
+		}
+}
+//============================================================证书 ========================================================================
+// 上传证书
+// 分页条更新
+function updatequnzuPageStatus(){
+	var pageLi = $('#paginau').find('li');
+	
+	// 获取token
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid + '/notifiers?limit=1000',
 			type:'GET',
 			headers:{
 				'Authorization':'Bearer '+access_token,
 				'Content-Type':'application/json'
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert('提示\n\n数据加载失败,可能是网络原因，请稍后重试!');
+			},
+			success: function(respData, textStatus, jqXHR) {
+				total = respData.entities.length;
+				var totalPage = (total % 5 == 0) ? (parseInt(total / 5)) : (parseInt(total / 5) + 1);
+				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
+				var ulB = '<ul>';
+				var ulE = '</ul>';
+				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
+				var textOp2 = '<li> <a href="javascript:void(0);" onclick="getNextAppUserList();">下一页</a> </li>';
+				$('#paginau').html('');
+				// 首页
+				if(pageNo == 1){
+					if(totalPage == 1){
+						//$(pageLi[0]).hide();
+						//$(pageLi[1]).hide();
+						$('#paginau').append(ulB + ulE);
+					} else {
+						$('#paginau').append(ulB + textOp2 + ulE);
+						//$(pageLi[0]).hide();
+						//$(pageLi[1]).show();
+					}
+					// 尾页
+				} else if(totalPage ==  pageNo){
+					$('#paginau').append(ulB + textOp1 + ulE);
+					//$(pageLi[0]).show();
+					//$(pageLi[1]).hide();
+				} else {
+					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
+					//$(pageLi[0]).show();
+					//$(pageLi[1]).show();
+				}
+			}
+		});
+	}
+}
+
+
+
+// 查询证书信息
+function getAppCredentials(appUuid, pageAction){
+	$('#paginau').html('');
+	var access_token = $.cookie('access_token');
+	var orgName = $.cookie('orgName');
+	if('next' == pageAction){
+			pageNo += 1;
+		} else if('forward' == pageAction){
+			pageNo -= 1;
+		}
+		var temp = '';
+		if(typeof(pageAction)!='undefined' && pageAction != ''){	
+			temp = '&cursor='+cursors[pageNo];
+		}
+	$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid + '/notifiers?limit=5'+temp,
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				
 			},
 			success: function(respData, textStatus, jqXHR) {
 				$('#appCredentialBody').html('');
-				
-				$(respData.entities).each(function(){
-					var name = this.name;
-					var credentialId = this.uuid;
-					var passphrase = this.passphrase;
-					var environment = '';
-					if(this.environment == 'DEVELOPMENT') {
-						environment = '开发';
-					} else if(this.environment == 'PRODUCTION'){
-						environment = '生产';
+				// 缓存游标,下次next时候存新的游标
+				if(pageAction!='forward'){
+					cursors[pageNo+1] =	respData.cursor;
+				} else {
+					cursors[pageNo+1] = null;
+				}
+				if(respData.entities.length ==0 && pageAction == 'no'){
+					getAppCredentials(appUuid,'forward' );
+				}else{
+					$(respData.entities).each(function(){
+						var name = this.name;
+						var credentialId = this.uuid;
+						var passphrase = this.passphrase;
+						var environment = '';
+						if(this.environment == 'DEVELOPMENT') {
+							environment = '开发';
+						} else if(this.environment == 'PRODUCTION'){
+							environment = '生产';
+						}
+						
+						var created = format(this.created);
+						var modified = format(this.modified);
+						var option = '<tr>'+
+								'<td class="text-center">'+name+'</td>'+
+								'<td class="text-center">'+environment+'</td>'+
+							'<td class="text-center">'+created+'</td>'+
+							'<td class="text-center">'+modified+'</td>'+
+							'<td class="text-center"><a href="javascript:deleteAppCredential(\''+ credentialId + '\',\''+ appUuid +'\')">删除</a></td>'+
+							'</tr>';
+							$('#appCredentialBody').append(option);
+					});
+				}
+				// 无数据
+				var tbody = document.getElementsByTagName("tbody")[0];
+				if(!tbody.hasChildNodes()){
+					var option = '<tr><td class="text-center" colspan="4">无数据!</td></tr>';
+					$('#appUserAdminBody').append(option);
+					var pageLi = $('#paginau').find('li');
+					for(var i=0;i<pageLi.length;i++){
+						$(pageLi[i]).hide();
 					}
-					
-					var created = format(this.created);
-					var modified = format(this.modified);
-					var option = '<tr>'+
-							'<td class="text-center">'+name+'</td>'+
-						 	'<td class="text-center">'+environment+'</td>'+
-					   	'<td class="text-center">'+created+'</td>'+
-					   	'<td class="text-center">'+modified+'</td>'+
-					   	'<td class="text-center"><a href="javascript:deleteAppCredential(\''+ credentialId + '\',\''+ appUuid +'\')">删除</a></td>'+
-				 		'</tr>';
-						$('#appCredentialBody').append(option);
-				});
-				
+				} else {
+					updatequnzuPageStatus();	
+				}
 				$('#showName').text(respData.applicationName);
 				$('#fileAppKey').text(respData.applicationName);
 				
@@ -1809,9 +3019,303 @@ function deleteAppCredential(credentialId,appUuid){
 			},
 			success: function(respData, textStatus, jqXHR) {
 					alert('证书已删除!')	
-					getAppCredentials(appUuid);
+					getAppCredentials(appUuid,'no');
 			}
 		});	
 	}
 }
-//=====================================================================================================================================
+
+//==============================================================IM=======================================================================
+// 用户好友列表
+function toAppIMList(owner_username){
+	window.location.href = 'app_IM_list.html?appUuid='+appUuid+'&owner_username='+owner_username;
+}
+//获取用户好友列表
+function getAppIMList(appUuid, owner_username){
+	// 获取token
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/'+owner_username+'/contacts/users',
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			},
+			success: function(respData, textStatus, jqXHR) {
+				
+				$('tbody').html('');
+				var i=0;
+				$(respData.data).each(function(){
+					/*var option = '<tr>'+
+								'<td style=" visibility:visible;"><input type="checkbox" value="fff"  style="width:100px; height:20px;border:1px solid #F00;"/>'+(i+1)+'</td>'+
+							 	'<td>'+respData.data[i]+'</td>'+
+							 	'<td style="padding:4px 0 0 0;"><a class="a_button" href="javascript:deleteAppIMFriend(\''+appUuid+'\', \''+owner_username+'\',\''+respData.data[i]+'\')"  style="display:block; background:#fafafa; border:1px solid #e0e8eb; width:100px; height:25px; line-height:25px; font-size:12px;">解除好友关系</a></td>'+
+					 		'</tr>';*/
+					var selectOptions = '<tr>'+
+							'<td style=" visibility:visible;"><input type="checkbox" value="fff"  style="width:100px; height:20px;border:1px solid #F00;"/>'+(i+1)+'</td>'+
+							'<td>'+respData.data[i]+'</td>'+
+						 	'<td class="text-center">'+
+								'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
+			    				'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+			    					'<ul class="dropdown-menu" style="left:150px;">'+
+				          		'<li><a href="javascript:deleteAppIMFriend(\''+appUuid+'\', \''+owner_username+'\',\''+respData.data[i]+'\')">解除好友关系</a></li>'+
+						     		'</ul>'+
+						     	'</li>'+
+					     	'</ul>'+
+							'</td>'+
+				 		'</tr>';
+					i++;
+					$('#appIMBody').append(selectOptions);
+				});
+				// 无数据
+				var tbody = document.getElementsByTagName("tbody")[0];
+				if(!tbody.hasChildNodes()){
+					var option = '<tr><td class="text-center" colspan="3">无数据!</td></tr>';
+					$('#appIMBody').append(option);
+					var pageLi = $('#paginau').find('li');
+					for(var i=0;i<pageLi.length;i++){
+						$(pageLi[i]).hide();
+					}
+				}
+			}
+		});
+	}
+}
+
+
+//删除某个好友
+function deleteAppIMFriend(appUuid, owner_username, friend_username){
+	//获取token
+	var orgName = $.cookie('orgName');
+	var access_token = $.cookie('access_token');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		if(window.confirm('确定删除此好友？')){
+			$.ajax({
+				url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/'+owner_username+'/contacts/users/'+friend_username,
+				type:'DELETE',
+				headers:{
+					'Authorization':'Bearer '+access_token,
+					'Content-Type':'application/json'
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+				},
+				success: function(respData, textStatus, jqXHR) {
+					location.replace(location.href);
+				}
+			});
+		}
+	}
+
+}
+
+//弹出添加好友页面
+function showAddFriend(appUuid,username){
+	$('#usernameFriend').val(username);
+	$('#appUuidFriend').val(appUuid);
+	$('#friendUsername').val('');
+	$('#showAddFriend').click();
+}
+
+//添加好友
+function addIMFriend(){
+	var orgName = $.cookie('orgName');
+	var access_token = $.cookie('access_token');
+	var owner_username = $('#usernameFriend').val();
+	var appUuid = $('#appUuidFriend').val();
+	var friend_username = $('#friendUsername').val();
+	if (friend_username == ''){
+		alert('好友名称不能为空!');	
+	}else{
+		$.ajax({
+				url:baseUrl+'/'+ orgName +'/' + appUuid +'/users/' + friend_username,
+				type:'POST',
+				headers:{
+					'Authorization':'Bearer '+access_token,
+					'Content-Type':'application/json'
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert('提示\n\n该用户不存在，请检查用户名!');
+				},
+				success: function(respData, textStatus, jqXHR) {
+					$.ajax({
+						url:baseUrl+'/'+ orgName +'/' + appUuid +'/users/' + owner_username + '/contacts/users/' + friend_username,
+						type:'POST',
+						headers:{
+							'Authorization':'Bearer '+access_token,
+							'Content-Type':'application/json'
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							
+						},
+						success: function(respData, textStatus, jqXHR) {
+							alert('添加好友成功!');
+							location.replace(location.href);
+						}
+					});
+				}
+		});
+	
+		
+	}
+	
+}
+
+
+//=====================================================================管理员===============================================================
+
+//获取管理员列表
+function getAppUsersAdminList(appUuid, pageAction){
+	// 获取token
+	$('#paginau').html('');
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'login.html';
+	} else {
+		if('next' == pageAction){
+			pageNo += 1;
+		} else if('forward' == pageAction){
+			pageNo -= 1;
+		}
+		var temp = '';
+		if(typeof(pageAction)!='undefined' && pageAction != ''){	
+			temp = '&cursor='+cursors[pageNo];
+		}
+		$.ajax({
+			url:baseUrl+'/'+ orgName +'/' + appUuid +'/roles/admin/users?limit=10' + temp,
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer '+access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			},
+			success: function(respData, textStatus, jqXHR) {
+				if(pageAction!='forward'){
+					if(respData.cursor){
+						cursors[pageNo+1] = respData.cursor;
+					}else{
+						cursors[pageNo+1] = null;
+					}
+				}
+				if(respData.entities.length ==0 && pageAction == 'no'){
+					getAppUsersAdminList(appUuid,'forward' );
+				}else{
+					$('tbody').html('');
+					var i=0;
+					$(respData.entities).each(function(){
+						var username = this.username;
+						var created = format(this.created);
+						/*var option = '<tr>'+
+									'<td class="text-center">'+(i+1)+'</td>'+	
+									'<td class="text-center">'+username+'</td>'+
+									'<td class="text-center">'+created+'</td>'+
+									'<td class="text-center">'+
+									'<a  class="btn btn-mini btn-info" href="javascript:deleteUserAdmin(\''+appUuid+'\',\''+username+'\')">撤销管理员</a></td>'+
+								'</tr>';*/
+						var selectOptions = '<tr>'+
+								'<td class="text-center">'+(i+1)+'</td>'+	
+								'<td class="text-center">'+username+'</td>'+
+								'<td class="text-center">'+created+'</td>'+
+								'<td class="text-center">'+
+									'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
+									'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+										'<ul class="dropdown-menu">'+
+									'<li><a href="javascript:deleteUserAdmin(\''+appUuid+'\',\''+username+'\')">撤销管理员</a></li>'+
+										'</ul>'+
+									'</li>'+
+								'</ul>'+
+								'</td>'+
+							'</tr>';
+						i++;
+						$('#appUserAdminBody').append(selectOptions);
+					});
+				}
+				// 无数据
+				var tbody = document.getElementsByTagName("tbody")[0];
+				if(!tbody.hasChildNodes()){
+					var option = '<tr><td class="text-center" colspan="4">无数据!</td></tr>';
+					$('#appUserAdminBody').append(option);
+					var pageLi = $('#paginau').find('li');
+					for(var i=0;i<pageLi.length;i++){
+						$(pageLi[i]).hide();
+					}
+				} else {
+					updateUsersAdminPageStatus();	
+				}
+			}
+		});
+	}
+}
+
+
+//设置管理员
+function setUserAdmin(appUuid,user_name){
+	//获取token
+	var token = $.cookie('access_token');
+	var orgName = $.cookie('orgName');
+	$.ajax({
+		url:baseUrl + '/' + orgName + '/' + appUuid + '/users/'+ user_name +'/roles/admin',
+		type:'POST',
+		data:{},
+		headers:{
+			'Authorization':'Bearer ' + token,
+			'Content-Type':'application/json'
+		},
+		success:function(respData){
+			// if success , to app user list
+			alert('设置管理员成功!')
+			getAppUserList(appUuid,'no');
+		},
+			error:function(data){
+			alert('设置管理员失败!')
+		}
+	});
+}
+	
+//撤销管理员
+function deleteUserAdmin(appUuid,user_name){
+	var token = $.cookie('access_token');
+	var orgName = $.cookie('orgName');
+	var url=window.location.href;
+	var str=url.substring(url.lastIndexOf('app_u'),url.lastIndexOf('.html'));
+	if(confirm('您确定要撤销此用户管理员身份么?')){
+		$.ajax({
+			url:baseUrl +'/' +orgName+'/'+appUuid+ '/roles/admin/users/'+user_name,
+	
+			type:'DELETE',
+			data:{},
+			headers:{
+				'Authorization':'Bearer ' + token,
+				'Content-Type':'application/json'
+			},
+			success:function(respData){
+				// if success , to app user list
+				alert('撤销管理员成功!')
+				if(str == 'app_users_admin'){
+					getAppUsersAdminList(appUuid,'no');
+				}else if(str == 'app_users'){
+					getAppUserList(appUuid,'no');
+				}
+				
+			},
+				error:function(data){
+				alert('撤销管理员失败!')
+			}
+		});
+	}
+	
+}

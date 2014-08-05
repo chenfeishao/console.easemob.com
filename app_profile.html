@@ -45,6 +45,9 @@
 <script src="assets/js/management.js"></script>
 <script tyep="text/javascript">
 	var appUuid = getQueryString('appUuid');
+	if(appUuid == "undefined"){
+      appUuid = $.cookie('appName');
+	}
 	$(function(){
 		if (!getToken() || getToken()==''){
 			logout();
@@ -66,8 +69,8 @@
 	}
 	
 	// 群组管理页
-	function toAppChatroomsPage(){
-		window.location.href = 'app_chatrooms.html?appUuid='+appUuid;
+	function togroupAppAdmin(){
+		window.location.href = 'app_group.html?appUuid='+appUuid;
 	}
 	
 	// 推送证书管理页
@@ -84,6 +87,11 @@
 		window.location.href = 'app_admin_create.html?appUuid='+appUuid;
 	}
 	
+	//管理员列表页面
+	function toAppUserAdmin(){
+		window.location.href = 'app_users_admin.html?appUuid='+appUuid;
+	}
+	
 	// 选项卡显示
 	function showAndoid(){
 		$('#androidTab').addClass('active');
@@ -96,6 +104,18 @@
 		$('#androidTab').removeClass('active');
 		$('#androidLi').hide();
 		$('#iosLi').show();
+	}
+	
+	//显示修改缩略图
+	function showImage(){
+		$('#imageWidth').val('');
+		$('#imageHeight').val('');
+		$('#showUpdateImage').click();
+	}
+	
+	//修改缩略图
+	function updateImageHTML(){
+		updateImage(appUuid);
 	}
 </script>
 </head>
@@ -117,7 +137,7 @@
           <ul id="user_menu" class="pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-closer">
             <li class="divider"></li>
             <li> <a href="admin_home.html"> <i class="icon-user"></i> 账户 </a> </li>
-            <li> <a onclick="logout();" href="javascript:void(0);"> <i class="icon-off"></i> 退出 </a> </li>
+            <li> <a onClick="logout();" href="javascript:void(0);"> <i class="icon-off"></i> 退出 </a> </li>
           </ul>
         </li>
       </ul>
@@ -153,13 +173,11 @@
       		<ul>
         		<li> <a href="javascript:toAppUsersPage()">IM用户</a> </li>
       		</ul>
-      		&nbsp;&nbsp;&nbsp;&nbsp;
-      		<!--
+      		<!--&nbsp;&nbsp;&nbsp;&nbsp;
       		<ul>
-        		<li> <a href="javascript:toAppChatroomsPage()">群组管理</a> </li>
-      		</ul>
+        		<li> <a href="javascript:togroupAppAdmin()">群组</a> </li>
+      		</ul>-->
       		&nbsp;&nbsp;&nbsp;&nbsp;
-      		-->
       		<ul>
         		<li> <a href="javascript:toAppCredentialsPage()">推送证书</a> </li>
       		</ul>
@@ -169,10 +187,14 @@
       		</ul>
       		&nbsp;&nbsp;&nbsp;&nbsp;
       		<ul>
-        		<li> <a href="javascript:toCreateAppAdmin()">添加应用管理员</a> </li>
+        		<li> <a href="javascript:toAppUserAdmin()">App管理员</a>
+        		 <a style="display:none" href="#updateImage" id="showUpdateImage" data-toggle="modal" role="button" ></a></li>
       		</ul>
+      		
+      		<hr/>
+      		
     		</div>
-    		<hr>
+    		
         <div class="row-fluid">
         	<div class="apply" style="background:#FFF">
 	      	  <table class="table table-striped table-bordered table-hover" style="width:400px;">
@@ -190,7 +212,7 @@
 	      	    </tr>
 	      	    <tr>
 	      	      <td align="right" width="150px"><strong>用户注册模式: </td>
-	      	      <td width="150px;"><span id="allowOpen"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="changeAllowOpen();" class="btn btn-mini btn-info">切换</a></strong></td>
+	      	      <td width="150px;"><span id="allowOpen"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onClick="changeAllowOpen();" class="btn btn-mini btn-info">切换</a></strong></td>
 	      	    	<input type="hidden" id="allowOpenHdd" name="allowOpenHdd" value=""/>
 	      	    </tr>
 	      	    <tr>
@@ -201,6 +223,10 @@
 	      	      <td align="right" width="150px"><strong>client_secret: </td>
 	      	      <td width="150px;"><span id="client_secret"></span></strong></td>
 	      	    </tr>
+	      	    <tr>
+	      	      <td align="right" width="150px"><strong>缩略图大小: </td>
+	      	      <td width="150px;"><span id="image_thumbnail_width"></span>&nbsp;&nbsp;*&nbsp;&nbsp;<span id="image_thumbnail_height"></span>(长 * 宽)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onClick="showImage();" class="btn btn-mini btn-info">修改</a></strong></td>
+	      	    </tr>
 	   	      </table>
 	      	</div>
 	      	<p>
@@ -210,8 +236,8 @@
 	      	<div class="count">
 						<div class="row-fluid">
 							<ul class="nav nav-tabs">
-								<li id="androidTab" class="active"><a href="javascript:void(0)" onclick="showAndoid()">Android</a></li>
-								<li id="iosTab"><a href="javascript:void(0)" onclick="showIos()">IOS</a></li>
+								<li id="androidTab" class="active"><a href="javascript:void(0)" onClick="showAndoid()">Android</a></li>
+								<li id="iosTab"><a href="javascript:void(0)" onClick="showIos()">IOS</a></li>
 							</ul>
       				<div class="pagination pagination-left">
       					<ul class="pagination">
@@ -274,5 +300,42 @@
     </div>
   </div>
 </div>
+       <!--修改缩略图大小-->
+		<div id="updateImage" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-header">
+				<button id="closeButn" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h3 id="myModalLabel">修改缩略图大小</h3>
+			</div>
+			<div class="modal-body">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="control-group">
+							<label class="control-label" for="imageHeight">长：</label>
+							<div class="controls" id="div1">
+								<input type="text" id="imageHeight" name="imageHeight" value=""/>
+								<input type="hidden" id="usernameMessage" name="usernameMessage" value=""/>
+								<input type="hidden" id="appUuidMessage" name="appUuidMessage" value=""/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-body">
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="control-group">
+							<label class="control-label" for="imageWidth">宽：</label>
+							<div class="controls" id="div1">
+								<input type="text" id="imageWidth" name="imageWidth" value=""/>
+							</div>
+						</div>
+					</div>
+				</div>
+			<div class="modal-footer"> 
+				<a class="btn" onClick="updateImageHTML();" href="javascript:void(0);">确定</a>
+				<button id="messageCloseBtn" class="btn" data-dismiss="modal" onClick="clsSpan()" aria-hidden="true">关闭</button>
+			</div>
+		</div>
+        <!--修改缩略图大小end-->
 </body>
 </html>

@@ -48,16 +48,56 @@
 <script type="text/javascript" src="assets/js/ichart.1.2.js"></script>
 <script src="assets/js/Chart.min.js"></script>
 <script src="assets/js/management.js"></script>
+<!-- 时间控件 -->
+<script src="assets/js/Calendar3.js"></script>
+
+<!-- 曲线图 -->
+         <!--<link href="assets/swf/FusionCharts/Charts/style.css" rel="stylesheet" type="text/css" />-->
+        <!--<link href="assets/swf/FusionCharts/Charts/prettify.css" rel="stylesheet" type="text/css" />-->
+        <script type="text/javascript" src="assets/swf/FusionCharts/Charts/FusionCharts.js"></script>
+        <script type="text/javascript" src="assets/swf/FusionCharts/Charts/prettify.js"></script>
+        <script type="text/javascript" src="assets/swf/FusionCharts/Charts/json2.js"></script>
+         <script type="text/javascript" src="assets/swf/FusionCharts/Charts/lib.js" ></script>
+<!-- 曲线图 -->
 <script tyep="text/javascript">
 	var appUuid = getQueryString('appUuid');
-
-	$(function(){
+	$(function(){    	
 		if (!getToken() || getToken()==''){
 			logout();
 		}
 
 		getAppProfile(appUuid);
-		
+		//初始开始时间段
+        var myDate = new Date();
+			var sataTime=myDate.getFullYear()+"-";
+			var tian=0;
+			if(myDate.getMonth()+1==1 || myDate.getMonth()+1==3 || myDate.getMonth()+1==5){
+                   tian=31;
+			}else if(myDate.getMonth()+1==7 || myDate.getMonth()+1==8 || myDate.getMonth()+1==10){
+                   tian=31;
+			}else if(myDate.getMonth()+1==12){
+                   tian=31;
+			}else if(myDate.getMonth()+1==2){
+                   tian=29;
+			}else{
+                   tian=30;
+			}
+	    //sataTime+=myDate.getMonth()+1; 
+	    //sataTime+=(myDate.getDate()-7);
+		  if((myDate.getDate()-6)>0){
+             sataTime+=myDate.getMonth()+1; 
+	         sataTime+=(myDate.getDate()-7);
+		  }else if((myDate.getDate()-6)<0){
+            sataTime+=myDate.getMonth(); 
+	        sataTime+="-"+(tian+(myDate.getDate()-6));
+		  }
+     	var endTime=myDate.getFullYear()+"-";
+	    endTime+=myDate.getMonth()+1; 
+	    endTime+="-"+myDate.getDate();
+	 		document.getElementById('control_date').value = sataTime;
+	 		document.getElementById('control_date2').value = endTime;
+         //初始开始时间段end
+
 		// 初始化先绘制好两幅图,默认把用户数据图显示
 		$('#canvasMsgDiv').hide();
 		$('#canvasUserDiv').show();
@@ -111,16 +151,6 @@
 	        return Math.min.apply(Math, arr);
 	    }
 	}
-		
-	var applyRequest = {
-			orgName:$.cookie('orgName'),
-			access_token:$.cookie('access_token'),
-			appUuid:appUuid,
-			start_time:'',
-			end_time:'',
-			resolution:'',
-			pad:''
-	};
 	
 	// 获取用户数据
 	function applyUserData(applyRequest,flow,labels){
@@ -313,7 +343,6 @@
 	// 消息发送统计图
 	function drawChatMessagesLineSmoothly(internal){
 			var flow=[], labels=[];
-			 
 			applyRequest.start_time = getNowTTamp() - internal*24*60*60*1000;
 			applyRequest.end_time = getNowTTamp();
 			applyRequest.resolution = 'day';
@@ -440,6 +469,95 @@
 			chart.draw();
 	}
 	
+  // 获取消息数据
+	var applyRequest = {
+			orgName:$.cookie('orgName'),
+			access_token:$.cookie('access_token'),
+			appUuid:appUuid,
+			start_time:'',
+			end_time:'',
+			resolution:'day',
+			pad:'true'
+	};
+	function applyChatMessagesData(applyRequest,flow,labels,url){
+	var startTime=$("#control_date").val();
+	var endTime=$("#control_date2").val();
+
+	var now_str = startTime.replace(/:/g, '-'); now_str = now_str.replace(/ /g, '-');
+	var arrs    = now_str.split("-");//分割成数组
+	var datums  = new Date(Date.UTC(arrs[0], arrs[1] - 1, arrs[2]));
+	var nowtime = datums.getTime();
+
+	var now_str1 = endTime.replace(/:/g, '-'); now_str1 = now_str1.replace(/ /g, '-');
+	var arrs1    = now_str1.split("-");//分割成数组
+	var datums1  = new Date(Date.UTC(arrs1[0], arrs1[1] - 1, arrs1[2]));
+	var nowtime1 = datums1.getTime();
+
+	applyRequest.start_time=nowtime;
+	applyRequest.end_time=nowtime1;
+		$.ajax({
+			url:baseUrl+'/'+ applyRequest.orgName +'/' + applyRequest.appUuid + '/counters?counter='+url+'&start_time='+applyRequest.start_time+'&end_time='+applyRequest.end_time+'&resolution='+applyRequest.resolution+'&pad='+applyRequest.pad,
+			type:'GET',
+			async:false,
+			headers:{
+				'Authorization':'Bearer ' + applyRequest.access_token,
+				'Content-Type':'application/json'
+			},
+			success: function(respData, textStatus, jqXHR) {
+			//alert(JSON.stringify(respData))
+				$.each(respData.counters,function(){
+					if(this.values.length == 0){
+						flow.push(0);
+						labels.push(0);
+					} else {
+						$.each(this.values,function(){
+							flow.push(this.value);
+							labels.push(format1(this.timestamp));
+						});
+					}
+				});
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+					alert('提示\n\n数据获取失败!');
+			},
+		});	
+	}
+	function getDiv(){
+	 
+			var flow=[], labels=[];
+			var url;
+			if($(':radio:checked').val()=="GET请求次数"){
+			   url='application.requests.get';
+			};
+			if($(':radio:checked').val()=="POST请求次数"){
+		       url='application.requests.post';
+			};
+			if($(':radio:checked').val()=="DELETE请求次数"){
+		       url='application.requests.delete';
+			};
+			if($(':radio:checked').val()=="PUT请求次数"){
+		       url='application.requests.put';
+			};
+			if($(':radio:checked').val()=="新增用户"){
+		       url='application.collection.users';
+			};
+			if($(':radio:checked').val()=="消息"){
+		       url='application.collection.chatmessages';
+			};
+
+			applyChatMessagesData(applyRequest,flow,labels,url);
+      var dataString ='<chart yAxisName="DATA" xAxisName="TIME" caption="'+$(':radio:checked').val()+'" subCaption="（单位：次）" useRoundEdges="1" color="333333" bgColor="FFFFFF,FFFFFF" showBorder="0">';
+			for(var i=0;i<labels.length;i++){dataString+='<set label="'+labels[i]+'" value="'+flow[i]+'" />';}
+			dataString+='</chart>';
+	  
+	  	/*var dataString ="<chart yAxisName='时长' subCaption='用户数据' useRoundEdges='1' color='333333' bgColor='FFFFFF,FFFFFF' showBorder='0'>\n\"*/
+      	if (GALLERY_RENDERER && GALLERY_RENDERER.search(/javascript|flash/i)==0)  FusionCharts.setCurrentRenderer(GALLERY_RENDERER);  
+            var chart = new FusionCharts("assets/swf/FusionCharts/Charts/Line.swf", "ChartId_flash", "1000", "500", "0", "1" );
+            chart.setXMLData( dataString );
+            chart.render("canvasUserDiv3");
+				//$('#control_date').trigger('click');//页面加载完成模拟点击事件
+			}
+			
 	// 应用概述页
 	function toApppofile(){
 		window.location.href = 'app_profile.html?appUuid='+appUuid;
@@ -451,8 +569,13 @@
 	}
 	
 	// 群组管理页
-	function toAppChatroomsPage(){
-		window.location.href = 'app_chatrooms.html?appUuid='+appUuid;
+	//function toAppChatroomsPage(){
+		//window.location.href = 'app_chatrooms.html?appUuid='+appUuid;
+	//}
+	
+	// 群组页面
+	function togroupAppAdmin(){
+		window.location.href = 'app_group.html?appUuid=' + appUuid;
 	}
 	
 	// 推送证书管理页
@@ -469,10 +592,16 @@
 	function toCreateAppAdmin(){
 		window.location.href = 'app_admin_create.html?appUuid='+appUuid;
 	}
+	
+	//管理员列表页面
+	function toAppUserAdmin(){
+		window.location.href = 'app_users_admin.html?appUuid='+appUuid;
+	}
 </script>
+
 </head>
 
-<body>
+<body onload="getDiv()">
 <div class="navbar navbar-inverse">
   <div class="navbar-inner">
     <div class="container-fluid"> <a class="brand" href="javascript:void(0);"> <small> <img style="height:45px;" src="assets/images/home_logo.png" alt="管理后台"/> </small> </a>
@@ -525,13 +654,11 @@
       		<ul>
         		<li> <a href="javascript:toAppUsersPage()">IM用户</a> </li>
       		</ul>
+      		<!--&nbsp;&nbsp;&nbsp;&nbsp;
+			 <ul>
+        		<li> <a href="javascript:togroupAppAdmin()">群组</a> </li>
+      		</ul>-->
       		&nbsp;&nbsp;&nbsp;&nbsp;
-      		<!--
-      		<ul>
-        		<li> <a href="javascript:toAppChatroomsPage()">群组管理</a> </li>
-      		</ul>
-      		&nbsp;&nbsp;&nbsp;&nbsp;
-      		-->
       		<ul>
         		<li> <a href="javascript:toAppCredentialsPage()">推送证书</a> </li>
       		</ul>
@@ -541,21 +668,37 @@
       		</ul>
       		&nbsp;&nbsp;&nbsp;&nbsp;
       		<ul>
-        		<li> <a href="javascript:toCreateAppAdmin()">添加应用管理员</a> </li>
+        		<li> <a href="javascript:toAppUserAdmin()">App管理员</a> </li>
       		</ul>
+      		
+      		<hr/>
+      		
     		</div>
-    		<hr>
-    		<div style="width:1000px; margin:0 auto; overflow:hidden;">
+
+    		<div style="width:1000px; margin:0 auto; overflow:visible;">
     			<div style="float:right;">
 							<input type="hidden" id="dtp_input2" value="" /><br/>
-		    		<input type="radio" name="divRadio" id="userDiv" checked="checked"/><span class="lbl">新增用户</span>
-		    		<input type="radio" name="divRadio" id="msgDiv" /><span class="lbl">消息</span>
+		    		<input type="radio" name="divRadio" id="userDiv" value="新增用户" onclick="getDiv()" checked="checked"/><span class="lbl">新增用户</span>
+		    		<input type="radio" name="divRadio" id="msgDiv" value="消息" onclick="getDiv()" /><span class="lbl">消息</span>
+					<input type="radio" name="divRadio" id="getDiv" value="GET请求次数" onclick="getDiv()" /><span class="lbl">GET请求次数</span>
+					<input type="radio" name="divRadio" id="postDiv" value="POST请求次数" onclick="getDiv()" /><span class="lbl">POST请求次数</span>
+					<input type="radio" name="divRadio" id="deleteDiv" value="DELETE请求次数" onclick="getDiv()" /><span class="lbl">DELETE请求次数</span>
+					<input type="radio" name="divRadio" id="putDiv" value="PUT请求次数" onclick="getDiv()" /><span class="lbl">PUT请求次数</span>
 		    	</div>
-			    <div>&nbsp;</div><div>&nbsp;</div>
+			    <div style="position:absolute;right:100px;top:200px;z-index:100;">
+               <span>查询时间段：</span>
+               <span>从
+               	<input name="control_date" type="text" value="" id="control_date" style="width:120px;" size="10" maxlength="10" onclick="new Calendar().show(this);" readonly="readonly" /></span>
+               <span>至
+               	<input name="control_date2" type="text" id="control_date2" style="width:120px;" size="10" maxlength="10" onclick="new Calendar().show(this);" readonly="readonly" /></span>
+								<input type="button" name="commit" id="commit" onclick="getDiv()" value="查询"/>
+				</div><div>&nbsp;</div>
 	    		<!-- 用户数据 -->
-	    		<div id='canvasUserDiv'></div>
+	    		<!--<div id='canvasUserDiv'></div>-->
 	    		<!-- 消息数据 -->
-	    		<div id='canvasMsgDiv'></div>
+	    		<!--<div id='canvasMsgDiv'></div>-->
+				    	    		<!-- 用户数据 -->
+	    		<div id='canvasUserDiv3'></div>
     		</div>
     	</div>
   	</div>

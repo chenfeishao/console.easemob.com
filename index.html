@@ -37,7 +37,15 @@
 <script src="assets/js/jquery.cookie-1.3.js"></script>
 <script src="assets/js/bootstrap-2.3.2.min.js"></script>
 <script src="assets/js/json2.js"></script>
-
+<!-- 邮箱提示 -->
+<script src="assets/js/email.js"></script>
+ <style type="text/css">
+     .out_box{border:1px solid #ccc; background:#fff; font:12px/20px Tahoma;}
+     .list_box{border-bottom:1px solid #eee; padding:0 5px; cursor:pointer;}
+     .focus_box{background:#f0f3f9;}
+     .mark_box{color:#c00;}
+  </style>
+<!-- 邮箱提示 -->
 <style type="text/css">
 .login-layout {
 	background: none repeat scroll 0 0 #e3eaf0;
@@ -219,17 +227,21 @@ function getBrowser() {
 		
 		var regEmail = $('#regEmail').val();
 		
-		var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+		//var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+		var emailReg = /^([a-zA-Z0-9]+[_|\_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
 		if(regEmail != '' && !emailReg.test(regEmail)){
 			$('#regEmailSEMsg').css('display','none');
 			$('#regEmailEMsg').text('请输入有效的邮箱！');
 			//$('#regEmail').focus();
 			return;
+		}else if(regEmail==''){
+		    $('#regEmailSEMsg').css('display','none');
+            $('#regEmailEMsg').text('邮箱不能为空！');
+			return;
 		}
 		
 	 	$('#regEmailEMsg').text('');	
 	}
-	
 	function onBlurRegTelCheck(){
 		$('#regTel').val($('#regTel').val().trim());
 		var regTel = $('#regTel').val();
@@ -240,22 +252,39 @@ function getBrowser() {
 			$('#regTelEMsg').text('联系电话号码格式不符合要求！');
 			//$('#regEmail').focus();
 			return;
-		}
-			
+		}	
 	 	$('#regTellEMsg').text('');
 	}
 	
 	function login(){
-		//var adminType = $('#loginRole').find('option:selected').val();
-		//if(adminType == 'app'){
-			//$('#appkeyLabel').show();
-			//appAdminLogin();
-		//} else if(adminType == 'org'){
-			//$('#appkeyLabel').hide();
+		/*var adminType12 = $('#loginRole').find('option:selected').val();
+		if(adminType12 == 'app'){
+		   if($('#yingyongname').val()==''){
+                //$('#regqiyeid').css('display','none');
+			    $('#regyingyongname').text('企业应用不能为空！');
+				return;
+		   }
+			appAdminLogin();
+		} else if(adminType12 == 'org'){
+		*/
 			orgAdminLogin();
 		//}
 	}
-	
+	/*$(function(){
+         $('#qiyeid').hide();
+		 $('#yingyongname').hide();
+	})*/
+	function app_org(){
+        var adminType = $('#loginRole').find('option:selected').val();
+		if(adminType == 'app'){
+			$('#qiyeid').show();
+			$('#yingyongname').show();
+			//appAdminLogin();
+		} else if(adminType == 'org'){
+			$('#qiyeid').hide();
+			$('#yingyongname').hide();
+		}
+	}
 	//function changeLabel(){
 		//var adminType = $('#loginRole').find('option:selected').val();
 		//if(adminType == 'app'){
@@ -283,9 +312,10 @@ function getBrowser() {
 		$('#regTelEMsg').text('');
 	}
 </script>
+
 </head>
 
-<body class="login-layout" onkeydown="keyLogin();">
+<body class="login-layout" onkeydown="keyLogin();" onload="app_org();">
 <div id="main-container" class="container-fluid">
   <div id="main-content">
     <div class="row-fluid">
@@ -323,9 +353,18 @@ function getBrowser() {
                           <i class="icon-lock"></i> <span class="Validform_checktip"></span></span> 
                           <span id="passwordEMsg" style="font-size:12px;color:red"></span>
                         </label>
-                        <!--<div class="row-fluid">
+                       <!--<label><span class="block input-icon input-icon-right">
+                          <input type="text" placeholder="企业ID" nullmsg="请输入企业ID！" datatype="*" value="" class="span12" name="qiyeid" id="qiyeid" onclick="keyLogin()"/>
+						  <span class="Validform_checktip"></span></span>
+						  <span id="regqiyeid" style="font-size:12px;color:red"></span>
+                        </label>
+						<label><span class="block input-icon input-icon-right">
+                          <input type="text" placeholder="应用名称" nullmsg="请输入应用名称！" datatype="*" class="span12" name="yingyongname" id="yingyongname" onclick="keyLogin()"/><span class="Validform_checktip"></span><span id="regyingyongname" style="font-size:12px;color:red"></span></span>
+                        </label>
+
+                        <div class="row-fluid">
                         	<div class="span8">
-                        			<select name="loginRole" id="loginRole" onchange="changeLabel()">
+                        			<select name="loginRole" id="loginRole" style="WIDTH:300px" onchange="app_org()">
                         				<option value="org">企业管理员</option>
                         				<option value="app">APP管理员</option>
 		                        	</select>
@@ -413,20 +452,30 @@ function getBrowser() {
                           <span id="regRePasswordEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label> <span class="block input-icon input-icon-right">
-                          <input type="text" id="regEmail" placeholder="电子邮件" class="span12" name="regEmail" value="" onblur="onBlurRegEmailCheck()">
+                          <input type="text" id="regEmail" placeholder="电子邮件" size="48px" class="span12" name="regEmail" value="" onblur="onBlurRegEmailCheck()">
                           <i class="icon-envelope"></i></span>
                           <span id="regEmailSEMsg" style="font-size:12px;"></span>
                           <span id="regEmailEMsg" style="font-size:12px;color:red"></span>
                         </label>
+						<script type="text/javascript">
+                           $("#regEmail").mailAutoComplete({
+                             boxClass: "out_box", //外部box样式
+                             listClass: "list_box", //默认的列表样式
+                             focusClass: "focus_box", //列表选样式中
+                             markCalss: "mark_box", //高亮样式
+                             autoClass: false,
+                             textHint: true //提示文字自动隐藏
+                             });
+                         </script>
                         <label> <span class="block input-icon input-icon-right">
                           <input type="text" id="regCompanyName" placeholder="企业名称" class="span12" name="regCompanyName" value="" />
-                          <i class="icon-home"></i></span>
+                          <i class="icon-home" style="z-index:0;"></i></span>
                           <span id="regCompanyNameSEMsg" style="font-size:12px;"></span>
                           <span id="regCompanyNameEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label><span class="block input-icon input-icon-right">
                           <input type="text" id="regTel" placeholder="联系电话" class="span12" name="regTel" value="" onblur="onBlurRegTelCheck()">
-                          <i class="icon-dashboard"></i></span>
+                          <i class="icon-dashboard" style="z-index:0;"></i></span>
                           <span id="regTelSEMsg" style="font-size:12px;">固话或者移动电话号码</span>
                           <span id="regTelEMsg" style="font-size:12px;color:red"></span>
                         </label>
