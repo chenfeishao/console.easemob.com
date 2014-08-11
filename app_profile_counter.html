@@ -50,7 +50,8 @@
 <script src="assets/js/management.js"></script>
 <!-- 时间控件 -->
 <script src="assets/js/Calendar3.js"></script>
-
+<script language="javascript" type="text/javascript" src="assets/js/My97DatePicker/WdatePicker.js"></script>
+<script src="assets/js/time.js"></script>
 <!-- 曲线图 -->
          <!--<link href="assets/swf/FusionCharts/Charts/style.css" rel="stylesheet" type="text/css" />-->
         <!--<link href="assets/swf/FusionCharts/Charts/prettify.css" rel="stylesheet" type="text/css" />-->
@@ -59,43 +60,46 @@
         <script type="text/javascript" src="assets/swf/FusionCharts/Charts/json2.js"></script>
          <script type="text/javascript" src="assets/swf/FusionCharts/Charts/lib.js" ></script>
 <!-- 曲线图 -->
-<script tyep="text/javascript">
+<script tyep="text/javascript" charset="utf-8">
 	var appUuid = getQueryString('appUuid');
-	$(function(){    	
+	var Application = $.cookie('Application');
+	var time; //记录当前时间
+	var satatime;//记录计算过后的时间
+	var company="天";//记录单位（天。小时，六小时）
+	var yName="用户数量变化";
+	//获取年-月-日 时：分：秒
+	var type ="Y-M-D h:m";
+        var myDate = new Date();
+			Y = myDate.getFullYear();//年份：如2013
+            M = myDate.getMonth()+1<10?"0"+(myDate.getMonth()+1):myDate.getMonth()+1;//月份：如06
+            D = myDate.getDate()<10?"0"+myDate.getDate():myDate.getDate();//日：如15
+            h = myDate.getHours()<10?"0"+myDate.getHours():myDate.getHours();
+            m = myDate.getMinutes()<10?"0"+myDate.getMinutes():myDate.getMinutes();
+            s = myDate.getSeconds()<10?"0"+myDate.getSeconds():myDate.getSeconds();
+	//获取年-月-日 时：分：秒end
+
+	$(function(){   
+	$('#showName').text(Application);
 		if (!getToken() || getToken()==''){
 			logout();
 		}
-
 		getAppProfile(appUuid);
 		//初始开始时间段
-        var myDate = new Date();
-			var sataTime=myDate.getFullYear()+"-";
-			var tian=0;
-			if(myDate.getMonth()+1==1 || myDate.getMonth()+1==3 || myDate.getMonth()+1==5){
-                   tian=31;
-			}else if(myDate.getMonth()+1==7 || myDate.getMonth()+1==8 || myDate.getMonth()+1==10){
-                   tian=31;
-			}else if(myDate.getMonth()+1==12){
-                   tian=31;
-			}else if(myDate.getMonth()+1==2){
-                   tian=29;
-			}else{
-                   tian=30;
-			}
-	    //sataTime+=myDate.getMonth()+1; 
-	    //sataTime+=(myDate.getDate()-7);
-		  if((myDate.getDate()-6)>0){
-             sataTime+=myDate.getMonth()+1; 
-	         sataTime+=(myDate.getDate()-7);
-		  }else if((myDate.getDate()-6)<0){
-            sataTime+=myDate.getMonth(); 
-	        sataTime+="-"+(tian+(myDate.getDate()-6));
-		  }
-     	var endTime=myDate.getFullYear()+"-";
-	    endTime+=myDate.getMonth()+1; 
-	    endTime+="-"+myDate.getDate();
-	 		document.getElementById('control_date').value = sataTime;
-	 		document.getElementById('control_date2').value = endTime;
+			//计算当前时间
+		      time = type.replace("Y",Y);
+              time = time.replace("M",M);
+              time = time.replace("D",D);
+              time = time.replace("h",h);
+              time = time.replace("m",m);
+              //time = time.replace("s",s);
+			//计算前7天时间
+			  if(D-6<=0){
+		          satatime=new Date(Y,M-1,D-6,h,m).format('yyyy-MM-dd hh:mm');
+               }else{
+                  satatime=new Date(Y,M-1,D-6,h,m).format('yyyy-MM-dd hh:mm');
+			   }
+		  	document.getElementById('control_date').value = satatime;
+	 		document.getElementById('control_date2').value = time;
          //初始开始时间段end
 
 		// 初始化先绘制好两幅图,默认把用户数据图显示
@@ -118,12 +122,11 @@
 			$('#userDiv').checked = false;
 			$('#canvasUserDiv').hide();
 			$('#canvasMsgDiv').show();
-			drawChatMessagesLineSmoothly(7);
+			//drawChatMessagesLineSmoothly(7);
 		});
 		
-	  drawLineUserSmoothly(7);
+	 // drawLineUserSmoothly(7);
 	});
-	
 	// 当前时间的时间戳
 	function getNowTTamp(){
 		 return	new Date().getTime();	
@@ -134,14 +137,7 @@
 		return m<10?'0'+m:m;
 	}
 	function format1(timeST){
-		var time = new Date(parseInt(timeST));
-		var y = time.getFullYear();
-		var m = time.getMonth()+1;
-		var d = time.getDate();
-		//var h = time.getHours();
-		//var mm = time.getMinutes();
-		//var s = time.getSeconds();
-		return y+'-'+add0(m)+'-'+add0(d);
+		return date('Y-m-d H:i',timeST);
 	}
 	
 	function getMaximin (arr,maximin) {
@@ -151,324 +147,6 @@
 	        return Math.min.apply(Math, arr);
 	    }
 	}
-	
-	// 获取用户数据
-	function applyUserData(applyRequest,flow,labels){
-		$.ajax({
-			url:baseUrl+'/'+ applyRequest.orgName +'/' + applyRequest.appUuid + '/counters?counter=application.collection.users&start_time='+applyRequest.start_time+'&end_time='+applyRequest.end_time+'&resolution='+applyRequest.resolution+'&pad='+applyRequest.pad,
-			type:'GET',
-			async:false,
-			headers:{
-				'Authorization':'Bearer ' + applyRequest.access_token,
-				'Content-Type':'application/json'
-			},
-			success: function(respData, textStatus, jqXHR) {
-				$.each(respData.counters,function(){
-					if(this.values.length == 0){
-						flow.push(0);
-						labels.push(0);
-					} else {
-						$.each(this.values,function(){
-							flow.push(this.value);
-							labels.push(format1(this.timestamp));
-						});
-					}
-				});
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-					alert('提示\n\n数据获取失败!');
-			},
-		});	
-	}
-	
-	// 获取消息数据
-	function applyChatMessagesData(applyRequest,flow,labels){
-		$.ajax({
-			url:baseUrl+'/'+ applyRequest.orgName +'/' + applyRequest.appUuid + '/counters?counter=application.collection.chatmessages&start_time='+applyRequest.start_time+'&end_time='+applyRequest.end_time+'&resolution='+applyRequest.resolution+'&pad='+applyRequest.pad,
-			type:'GET',
-			async:false,
-			headers:{
-				'Authorization':'Bearer ' + applyRequest.access_token,
-				'Content-Type':'application/json'
-			},
-			success: function(respData, textStatus, jqXHR) {
-				$.each(respData.counters,function(){
-					if(this.values.length == 0){
-						flow.push(0);
-						labels.push(0);
-					} else {
-						$.each(this.values,function(){
-							flow.push(this.value);
-							labels.push(format1(this.timestamp));
-						});
-					}
-				});
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-					alert('提示\n\n数据获取失败!');
-			},
-		});	
-	}
-	
-	// 用户图表
-	function drawLineUserSmoothly(internal){
-			var flow=[], labels=[];
-			 
-			applyRequest.start_time = getNowTTamp() - internal*24*60*60*1000;
-			applyRequest.end_time = getNowTTamp();
-			applyRequest.resolution = 'day';
-			applyRequest.pad = 'true';
-			
-			applyUserData(applyRequest,flow,labels);
-			
-			var flowMax = getMaximin(flow,"max");
-			var sspace = 0;
-			 if(flowMax > 0 && flowMax < 10000){
-					sspace = 100;
-			} else if(flowMax > 10000 && flowMax < 100000){
-					sspace = 1000;
-			}
-			var data = [{
-				//name : 'PVssssss',
-				value: flow,
-				color: '#1f7e92',
-				line_width: 1
-				}
-			];
-			var chart = new iChart.LineBasic2D({
-				render : 'canvasUserDiv',
-				data: data,
-				align:'center',
-				title : {
-					text:'每日新增用户数量统计',
-					//font : '微软雅黑',
-					fontsize:24,
-					//color:'#b4b4b4'
-				},
-				subtitle : {
-					text:'(单位：个)',
-					//font : '微软雅黑',
-					//color:'#b4b4b4'
-				},
-				footnote : {
-					text:'数据来源: 环信',
-					//font : '微软雅黑',
-					fontsize:11,
-					fontweight:600,
-					padding:'0 28',
-					//color:'#b4b4b4'
-				},
-				width : 1000,
-				height : 450,
-				shadow:true,
-				shadow_color : '#202020',
-				shadow_blur : 8,
-				shadow_offsetx : 0,
-				shadow_offsety : 0,
-				background_color: null,
-				animation : true,   //开启过渡动画
-				animation_duration:1000,  //1s完成动画 
-				tip:{
-					enable:true,
-					shadow:true,
-					listeners:{
-						//tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
-						parseText:function(tip,name,value,text,i){
-							return "<span style='color:#005268;font-size:12px;'>"+labels[i]+"<br/> 新增用户数约:"+
-							"</span><span style='color:#005268;font-size:20px;'>"+value+"个</span>";
-						}
-					}
-				},
-				crosshair:{
-					enable:true,
-					line_color:'#62bce9'
-				},
-				sub_option : {
-					smooth : true,
-					label:false,
-					hollow:false,
-					hollow_inside:false,
-					point_size:6
-				},
-				coordinate:{
-					width:770,
-					height:300,
-					striped_factor : 0.18,
-					grid_color:'#9f9f9f',
-					axis:{
-						color:'#9f9f9f',
-						width:[0,0,2,2]
-					},
-					scale:[{
-						position:'left',
-						start_scale:0,
-						end_scale:Math.ceil(flowMax + sspace),
-						scale_space:sspace,
-						scale_size:2,
-						scale_enable : false,
-						label : {color:'#1f7e92',font : '微软雅黑',fontsize:11,fontweight:600},
-						scale_color:'#1f7e92'
-					},{
-						position:'bottom',
-						label : {color:'#1f7e92',font : '微软雅黑',fontsize:11,fontweight:600},
-						scale_enable : false,
-						labels:labels
-					}]
-				}
-			});
-			
-			//利用自定义组件构造左侧说明文本
-			chart.plugin(new iChart.Custom({
-				drawFn:function(){
-					//计算位置
-					var coo = chart.getCoordinate(),
-					x = coo.get('originx'),
-					y = coo.get('originy'),
-					w = coo.width,
-					h = coo.height;
-					//在左上侧的位置，渲染一个单位的文字
-					chart.target.textAlign('start')
-					.textBaseline('bottom')
-					.textFont('600 11px 微软雅黑')
-					.fillText('新增用户数(个)',x-40,y-12,false,'#9d987a')
-					.textBaseline('top')
-					.fillText('         (时间)',x+w+12,y+h+10,false,'#9d987a');
-				}
-			}));
-			
-			//开始画图
-			chart.draw();
-	}
-	
-	// 消息发送统计图
-	function drawChatMessagesLineSmoothly(internal){
-			var flow=[], labels=[];
-			applyRequest.start_time = getNowTTamp() - internal*24*60*60*1000;
-			applyRequest.end_time = getNowTTamp();
-			applyRequest.resolution = 'day';
-			applyRequest.pad = 'true';
-			
-			applyChatMessagesData(applyRequest,flow,labels);
-			
-			var flowMax = getMaximin(flow,"max");
-			var sspace = 0;
-			if(flowMax > 1000 && flowMax < 1000){
-					sspace = 100;
-			} else if(flowMax > 1000 && flowMax < 100000){
-					sspace = 500;
-			}
-			var data = [{
-				//name : 'PVssssss',
-				value: flow,
-				color: '#1f7e92',
-				line_width: 1
-				}
-			];
-			var chart = new iChart.LineBasic2D({
-				render : 'canvasMsgDiv',
-				data: data,
-				align:'center',
-				title : {
-					text:'每日消息发送数量统计',
-					//font : '微软雅黑',
-					fontsize:24,
-					//color:'#b4b4b4'
-				},
-				subtitle : {
-					text:'(单位：条)',
-					//font : '微软雅黑',
-					//color:'#b4b4b4'
-				},
-				footnote : {
-					text:'数据来源: 环信',
-					//font : '微软雅黑',
-					fontsize:11,
-					fontweight:600,
-					padding:'0 28',
-					//color:'#b4b4b4'
-				},
-				width : 1000,
-				height : 450,
-				shadow:true,
-				shadow_color : '#202020',
-				shadow_blur : 8,
-				shadow_offsetx : 0,
-				shadow_offsety : 0,
-				background_color: null,
-				animation : true,   //开启过渡动画
-				animation_duration: 1000,  //1000ms完成动画 
-				tip:{
-					enable:true,
-					shadow:true,
-					listeners:{
-						//tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
-						parseText:function(tip,name,value,text,i){
-							return "<span style='color:#005268;font-size:12px;'>"+labels[i]+"<br/> 发送消息数约:"+
-							"</span><span style='color:#005268;font-size:20px;'>"+value+"条</span>";
-						}
-					}
-				},
-				crosshair:{
-					enable:true,
-					line_color:'#62bce9'
-				},
-				sub_option : {
-					smooth : true,
-					label:false,
-					hollow:false,
-					hollow_inside:false,
-					point_size:6
-				},
-				coordinate:{
-					width:770,
-					height:300,
-					striped_factor : 0.18,
-					grid_color:'#9f9f9f',
-					axis:{
-						color:'#9f9f9f',
-						width:[0,0,4,4]
-				},
-				scale:[{
-						position:'left',
-						start_scale:0,
-						end_scale:Math.ceil(flowMax + sspace),
-						scale_space:sspace,
-						scale_size:2,
-						scale_enable : false,
-						label : {color:'#1f7e92',font : '微软雅黑',fontsize:11,fontweight:600},
-						scale_color:'#1f7e92'
-					},{
-						position:'bottom',
-						label : {color:'#1f7e92',font : '微软雅黑',fontsize:11,fontweight:600},
-						scale_enable : false,
-						labels:labels
-					}]
-				}
-			});
-			
-			//利用自定义组件构造左侧说明文本
-			chart.plugin(new iChart.Custom({
-				drawFn:function(){
-					//计算位置
-					var coo = chart.getCoordinate(),
-					x = coo.get('originx'),
-					y = coo.get('originy'),
-					w = coo.width,
-					h = coo.height;
-					//在左上侧的位置，渲染一个单位的文字
-					chart.target.textAlign('start')
-					.textBaseline('bottom')
-					.textFont('600 11px 微软雅黑')
-					.fillText('消息数量(条)',x-40,y-12,false,'#9d987a')
-					.textBaseline('top')
-					.fillText('         (时间)',x+w+12,y+h+10,false,'#9d987a');
-				}
-			}));
-			
-			//开始画图
-			chart.draw();
-	}
-	
   // 获取消息数据
 	var applyRequest = {
 			orgName:$.cookie('orgName'),
@@ -480,21 +158,32 @@
 			pad:'true'
 	};
 	function applyChatMessagesData(applyRequest,flow,labels,url){
-	var startTime=$("#control_date").val();
-	var endTime=$("#control_date2").val();
+		var startTime=$("#control_date").val();
+		var endTime=$("#control_date2").val();
 
-	var now_str = startTime.replace(/:/g, '-'); now_str = now_str.replace(/ /g, '-');
-	var arrs    = now_str.split("-");//分割成数组
-	var datums  = new Date(Date.UTC(arrs[0], arrs[1] - 1, arrs[2]));
-	var nowtime = datums.getTime();
-
-	var now_str1 = endTime.replace(/:/g, '-'); now_str1 = now_str1.replace(/ /g, '-');
-	var arrs1    = now_str1.split("-");//分割成数组
-	var datums1  = new Date(Date.UTC(arrs1[0], arrs1[1] - 1, arrs1[2]));
-	var nowtime1 = datums1.getTime();
-
-	applyRequest.start_time=nowtime;
-	applyRequest.end_time=nowtime1;
+		var dt = Date.parse(startTime.replace(/-/g,"/"));//开始时间
+		var startTime1 = new Date(dt);
+		var nowtime = startTime1.getTime();
+		var dt1 = Date.parse(endTime.replace(/-/g,"/"));//结束时间
+		var theTime =new Date(dt1);
+		var nowtime1 = theTime.getTime();
+		/*
+		var now_str = startTime.replace(/:/g, '-'); 
+			now_str = now_str.replace(/ /g, '-');
+		var arrs = now_str.split("-");//分割成数组
+		var datums  = new Date(Date.UTC(arrs[0], arrs[1] - 1, arrs[2], arrs[3], arrs[4]));
+		var nowtime = datums.getTime();
+		
+		var now_str1 = endTime.replace(/:/g, '-'); 
+			now_str1 = now_str1.replace(/ /g, '-');
+		var arrs1  = now_str1.split("-");//分割成数组
+		var datums1  = new Date(Date.UTC(arrs1[0], arrs1[1] - 1, arrs1[2], arrs1[3], arrs1[4]));
+		var nowtime1 = datums1.getTime();
+		alert(nowtime+"烦烦烦"+startTime);
+		*/
+		applyRequest.start_time=nowtime;
+		applyRequest.end_time=nowtime1;
+		
 		$.ajax({
 			url:baseUrl+'/'+ applyRequest.orgName +'/' + applyRequest.appUuid + '/counters?counter='+url+'&start_time='+applyRequest.start_time+'&end_time='+applyRequest.end_time+'&resolution='+applyRequest.resolution+'&pad='+applyRequest.pad,
 			type:'GET',
@@ -522,32 +211,136 @@
 			},
 		});	
 	}
+	function determine(){
+	   var statime=$("#control_date").val();
+	   var endtime=$("#control_date2").val();
+	   if(statime>endtime){
+	      alert("请重新选择时间，开始时间不能大于结束时间");
+          return;
+	   }
+	}
 	function getDiv(){
-	 
+	         //determine();
 			var flow=[], labels=[];
 			var url;
+			var danwei;
+			var divRadio1 = document.getElementsByName("divRadio1");
+			var timeValue;
+			for(var i=0;i<divRadio1.length;i++){
+				if(divRadio1[i].checked){
+					timeValue=divRadio1[i].value;
+				}
+			}
+			if(timeValue == "六小时"){
+				//计算当前时间
+				  time = type.replace("Y",Y);
+				  time = time.replace("M",M);
+				  time = time.replace("D",D);
+				  time = time.replace("h",h);
+				  time = time.replace("m",m);
+				  if(h-6<=0){
+					     satatime=new Date(Y,M-1,D-1,h-6,m).format('yyyy-MM-dd hh:mm');
+						 
+				   }else{
+					     satatime=new Date(Y,M-1,D,h-6,m).format('yyyy-MM-dd hh:mm');
+				   }
+				   company="小时";
+				   applyRequest.resolution='hour';
+				   document.getElementById('control_date').value = satatime;
+				   document.getElementById('control_date2').value = time;
+			}else if(timeValue == "十二小时"){
+				//计算当前时间
+				  time = type.replace("Y",Y);
+				  time = time.replace("M",M);
+				  time = time.replace("D",D);
+				  time = time.replace("h",h);
+				  time = time.replace("m",m);
+			     if(h-12<=0){
+					     satatime=new Date(Y,M-1,D-1,h-12,m).format('yyyy-MM-dd hh:mm');
+				   }else{
+					     satatime=new Date(Y,M-1,D,h-12,m).format('yyyy-MM-dd hh:mm');
+				   }
+				   company="小时";
+				   applyRequest.resolution='hour';
+				   document.getElementById('control_date').value = satatime;
+				   document.getElementById('control_date2').value = time;
+			}else if(timeValue == "一天"){
+			       //计算当前时间
+				  time = type.replace("Y",Y);
+				  time = time.replace("M",M);
+				  time = time.replace("D",D);
+				  time = time.replace("h",h);
+				  time = time.replace("m",m);
+			     if(D-1<=0){
+						  satatime=new Date(Y,M-1,D-1,h,m).format('yyyy-MM-dd hh:mm');
+					   }else{
+						  satatime=new Date(Y,M-1,D-1,h,m).format('yyyy-MM-dd hh:mm');
+					   }
+					  company="六小时";
+					  applyRequest.resolution='six_hour';
+			          document.getElementById('control_date').value = satatime;
+			          document.getElementById('control_date2').value = time;
+			}else if(timeValue == "七天"){
+			          //计算当前时间
+					  time = type.replace("Y",Y);
+					  time = time.replace("M",M);
+					  time = time.replace("D",D);
+					  time = time.replace("h",h);
+					  time = time.replace("m",m);
+					  if(D-6<=0){
+						  satatime=new Date(Y,M-1,D-6,h,m).format('yyyy-MM-dd hh:mm');
+					   }else{
+						  satatime=new Date(Y,M-1,D-6,h,m).format('yyyy-MM-dd hh:mm');
+					   }
+					  company="六小时";
+					  applyRequest.resolution='six_hour';
+			          document.getElementById('control_date').value = satatime;
+			          document.getElementById('control_date2').value = time;
+			}
+
+            var textStateTime=$("#control_date").val();
+	        var textEndtime=$("#control_date2").val();
+	        if(textStateTime>textEndtime || textStateTime==textEndtime){
+	           alert("请重新选择时间，开始时间必须小于结束时间");
+               return;
+	          }else if(textEndtime>time){
+			    alert("请重新选择结束日期，结束日期不能大于本日日期");
+				return;
+			  }else{
 			if($(':radio:checked').val()=="GET请求次数"){
 			   url='application.requests.get';
+			   danwei='次';
+			   yName="GET请求数量";
 			};
 			if($(':radio:checked').val()=="POST请求次数"){
 		       url='application.requests.post';
+			   danwei='次';
+			   yName="POST请求数量";
 			};
 			if($(':radio:checked').val()=="DELETE请求次数"){
 		       url='application.requests.delete';
+			   danwei='次';
+			   yName="DELETE请求数量";
 			};
 			if($(':radio:checked').val()=="PUT请求次数"){
 		       url='application.requests.put';
+			   danwei='次';
+			   yName="PUT请求数量";
 			};
-			if($(':radio:checked').val()=="新增用户"){
+			if($(':radio:checked').val()=="IM用户"){
 		       url='application.collection.users';
+			   danwei='个';
+			   yName="用户数量变化";
 			};
 			if($(':radio:checked').val()=="消息"){
 		       url='application.collection.chatmessages';
+			   danwei='条';
+			   yName="消息发送数量";
 			};
-
-			applyChatMessagesData(applyRequest,flow,labels,url);
-      var dataString ='<chart yAxisName="DATA" xAxisName="TIME" caption="'+$(':radio:checked').val()+'" subCaption="（单位：次）" useRoundEdges="1" color="333333" bgColor="FFFFFF,FFFFFF" showBorder="0">';
-			for(var i=0;i<labels.length;i++){dataString+='<set label="'+labels[i]+'" value="'+flow[i]+'" />';}
+               };
+			applyChatMessagesData(applyRequest,flow,labels,url);/* labelDisplay="ROTATE" slentlabels="1" 跳跃模式labelStep='4' */
+      var dataString ='<chart rotateYAxisName="0" yAxisName="'+yName+'" chartRightMargin="50" xAxisName="时间 (按'+company+'计)" caption="'+$(':radio:checked').val()+'" subCaption="（单位：'+danwei+'）" useRoundEdges="1" color="333333" bgColor="FFFFFF,FFFFFF" showBorder="0">';
+			for(var i=0;i<labels.length;i++){/*if(flow[i]<0){flow[i]=0;}*/dataString+='<set label="'+labels[i]+'" value="'+flow[i]+'" />';}
 			dataString+='</chart>';
 	  
 	  	/*var dataString ="<chart yAxisName='时长' subCaption='用户数据' useRoundEdges='1' color='333333' bgColor='FFFFFF,FFFFFF' showBorder='0'>\n\"*/
@@ -557,7 +350,112 @@
             chart.render("canvasUserDiv3");
 				//$('#control_date').trigger('click');//页面加载完成模拟点击事件
 			}
-			
+  function getDiv1(){
+	         //determine();
+			company="天";
+		    applyRequest.resolution='day';
+			var flow=[], labels=[];
+			var url;
+			var danwei;
+			var statime=$("#control_date").val();
+	        var endtime=$("#control_date2").val();
+			var divRadio1 = document.getElementsByName("divRadio1");
+			for(var i=0;i<divRadio1.length;i++){
+				if(divRadio1[i].checked){
+					divRadio1[i].checked=false;
+				}
+			}
+            
+	        if(statime>endtime || statime==endtime){
+	           alert("请重新选择时间，开始时间必须小于结束时间");
+               return;
+	          }else if(endtime>time){
+			    alert("请重新选择结束日期，结束日期不能大于本日日期");
+				return;
+			  }else{
+
+					var dt = Date.parse(statime.replace(/-/g,"/"));//开始时间
+					var startTime = new Date(dt);
+					var dt1 = Date.parse(endtime.replace(/-/g,"/"));//结束时间
+					var theTime =new Date(dt1);
+					var timeDifference=theTime.getTime()-startTime.getTime();  //时间差的毫秒数
+					var days=Math.floor(timeDifference/(24*3600*1000));//计算相差天数
+					//计算出小时数
+					var leave1=timeDifference%(24*3600*1000);    //计算天数后剩余的毫秒数
+					var hours=Math.floor(leave1/(3600*1000));
+					//计算相差分钟数
+					var leave2=leave1%(3600*1000);        //计算小时数后剩余的毫秒数
+					var minutes=Math.floor(leave2/(60*1000));
+					 if(days>30){//超过一月按月算
+                         company="月";
+					     applyRequest.resolution='month';
+					 }else{//否则按天算
+                         company="天";
+					     applyRequest.resolution='day';
+					 }
+					 if(days==0){//没有超过一月就对比天数
+						 if(hours>24){//超过一天按天算
+                           company="天";
+					       applyRequest.resolution='day';
+						 }else{//没有超过一天就按小时算
+                           company="小时";
+					       applyRequest.resolution='hour';
+						 }
+					 }
+					 if(days==0 && hours==0){//没有超过一个月，又没有超过一天
+                          if(minutes<30){//没有超过半小时按分钟计
+						     company="五分钟";
+					         applyRequest.resolution='five_minutes';
+						  }else{//超过30分钟，按小时计
+                             company="小时";
+					         applyRequest.resolution='hour';
+						  }
+					 }
+
+			if($(':radio:checked').val()=="GET请求次数"){
+			   url='application.requests.get';
+			   danwei='次';
+			   yName="GET请求数量";
+			};
+			if($(':radio:checked').val()=="POST请求次数"){
+		       url='application.requests.post';
+			   danwei='次';
+			   yName="POST请求数量";
+			};
+			if($(':radio:checked').val()=="DELETE请求次数"){
+		       url='application.requests.delete';
+			   danwei='次';
+			   yName="DELETE请求数量";
+			};
+			if($(':radio:checked').val()=="PUT请求次数"){
+		       url='application.requests.put';
+			   danwei='次';
+			   yName="PUT请求数量";
+			};
+			if($(':radio:checked').val()=="新增用户"){
+		       url='application.collection.users';
+			   danwei='个';
+			   yName="用户数量变化";
+			};
+			if($(':radio:checked').val()=="消息"){
+		       url='application.collection.chatmessages';
+			   danwei='条';
+			   yName="消息发送数量";
+			};
+               };
+			applyChatMessagesData(applyRequest,flow,labels,url);
+      var dataString ='<chart rotateYAxisName="0" yAxisName="'+yName+'" chartRightMargin="50" xAxisName="时间 (按'+company+'计)" caption="'+$(':radio:checked').val()+'" subCaption="（单位：'+danwei+'）" useRoundEdges="1" color="333333" bgColor="FFFFFF,FFFFFF" showBorder="0">';
+			for(var i=0;i<labels.length;i++){/*if(flow[i]<0){flow[i]=0;}*/dataString+='<set label="'+labels[i]+'" value="'+flow[i]+'" />';}
+			dataString+='</chart>';
+	  
+	  	/*var dataString ="<chart yAxisName='时长' subCaption='用户数据' useRoundEdges='1' color='333333' bgColor='FFFFFF,FFFFFF' showBorder='0'>\n\"*/
+      	if (GALLERY_RENDERER && GALLERY_RENDERER.search(/javascript|flash/i)==0)  FusionCharts.setCurrentRenderer(GALLERY_RENDERER);  
+            var chart = new FusionCharts("assets/swf/FusionCharts/Charts/Line.swf", "ChartId_flash", "1000", "500", "0", "1" );
+            chart.setXMLData( dataString );
+            chart.render("canvasUserDiv3");
+				//$('#control_date').trigger('click');//页面加载完成模拟点击事件
+			}
+
 	// 应用概述页
 	function toApppofile(){
 		window.location.href = 'app_profile.html?appUuid='+appUuid;
@@ -598,7 +496,6 @@
 		window.location.href = 'app_users_admin.html?appUuid='+appUuid;
 	}
 </script>
-
 </head>
 
 <body onload="getDiv()">
@@ -609,8 +506,8 @@
         <ol>
           <li><a href="http://www.easemob.com" target="_blank"><h5>主页</h5></a></li>
           <li><a href="http://developer.easemob.com" target="_blank"><h5>文档</h5></a></li>
-          <li><a href="http://www.easemob.com/faq/" target="_blank"><h5>帮助</h5></a></li>
-          <li><a href="http://www.easemob.com/sdk/" target="_blank"><h5>下载SDK</h5></a></li>
+          <li><a href="http://www.easemob.com/faq.php" target="_blank"><h5>帮助</h5></a></li>
+          <li><a href="http://www.easemob.com/downloads.php" target="_blank"><h5>下载SDK</h5></a></li>
         </ol>
     	</div>
       <ul class="nav ace-nav pull-right">
@@ -655,7 +552,7 @@
         		<li> <a href="javascript:toAppUsersPage()">IM用户</a> </li>
       		</ul>
       		<!--&nbsp;&nbsp;&nbsp;&nbsp;
-			 <ul>
+			    <ul>
         		<li> <a href="javascript:togroupAppAdmin()">群组</a> </li>
       		</ul>-->
       		&nbsp;&nbsp;&nbsp;&nbsp;
@@ -678,27 +575,34 @@
     		<div style="width:1000px; margin:0 auto; overflow:visible;">
     			<div style="float:right;">
 							<input type="hidden" id="dtp_input2" value="" /><br/>
-		    		<input type="radio" name="divRadio" id="userDiv" value="新增用户" onclick="getDiv()" checked="checked"/><span class="lbl">新增用户</span>
+		    		<input type="radio" name="divRadio" id="userDiv" value="IM用户" onclick="getDiv()"/><span class="lbl">IM用户</span>
 		    		<input type="radio" name="divRadio" id="msgDiv" value="消息" onclick="getDiv()" /><span class="lbl">消息</span>
 					<input type="radio" name="divRadio" id="getDiv" value="GET请求次数" onclick="getDiv()" /><span class="lbl">GET请求次数</span>
 					<input type="radio" name="divRadio" id="postDiv" value="POST请求次数" onclick="getDiv()" /><span class="lbl">POST请求次数</span>
 					<input type="radio" name="divRadio" id="deleteDiv" value="DELETE请求次数" onclick="getDiv()" /><span class="lbl">DELETE请求次数</span>
 					<input type="radio" name="divRadio" id="putDiv" value="PUT请求次数" onclick="getDiv()" /><span class="lbl">PUT请求次数</span>
 		    	</div>
-			    <div style="position:absolute;right:100px;top:200px;z-index:100;">
+				<div style="position:absolute;right:180px;top:185px;z-index:100;">
+                    <input type="hidden" id="dtp_input2" value="" /><br/><span class="lbl">快速查询：</span>
+		    		<input type="radio" name="divRadio1" id="userDiv1" value="六小时" onclick="getDiv()"/><span class="lbl">六小时</span>
+		    		<input type="radio" name="divRadio1" id="msgDiv1" value="十二小时" onclick="getDiv()" /><span class="lbl">十二小时</span>
+					<input type="radio" name="divRadio1" id="getDiv1" value="一天" onclick="getDiv()" /><span class="lbl">一天</span>
+					<input type="radio" name="divRadio1" id="postDiv1" value="七天" onclick="getDiv()" /><span class="lbl">七天</span>
+				</div>
+			    <div style="position:absolute;right:100px;top:250px;z-index:100;">
                <span>查询时间段：</span>
-               <span>从
-               	<input name="control_date" type="text" value="" id="control_date" style="width:120px;" size="10" maxlength="10" onclick="new Calendar().show(this);" readonly="readonly" /></span>
+               <span>从<!-- onclick="new Calendar().show(this);" -->
+               	<input name="control_date" type="text" value="" id="control_date" style="width:120px;" size="10" maxlength="10" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})"  readonly="readonly" /></span>
                <span>至
-               	<input name="control_date2" type="text" id="control_date2" style="width:120px;" size="10" maxlength="10" onclick="new Calendar().show(this);" readonly="readonly" /></span>
-								<input type="button" name="commit" id="commit" onclick="getDiv()" value="查询"/>
-				</div><div>&nbsp;</div>
+               	<input name="control_date2" type="text" id="control_date2" style="width:120px;" size="10" maxlength="10" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})" readonly="readonly" /></span>
+				<input type="button" name="commit" id="commit" onclick="getDiv1()" value="查询"/>
+				</div><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 	    		<!-- 用户数据 -->
 	    		<!--<div id='canvasUserDiv'></div>-->
 	    		<!-- 消息数据 -->
 	    		<!--<div id='canvasMsgDiv'></div>-->
 				    	    		<!-- 用户数据 -->
-	    		<div id='canvasUserDiv3'></div>
+	    		<div id='canvasUserDiv3' style="position:absolute;top:300px;z-index:100;"></div>
     		</div>
     	</div>
   	</div>

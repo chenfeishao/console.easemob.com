@@ -43,10 +43,12 @@
 <script src="assets/js/ace.min.js"></script>
 <script src="assets/js/jquery.form.js"></script>
 <script src="assets/js/management.js"></script>
+<script src="assets/js/layer/layer.min.js"></script>
 <script tyep="text/javascript">
 	var appUuid = getQueryString('appUuid');
-	
+	var Application = $.cookie('Application');
 	$(function(){
+	    $('#showName').text(Application);
 		if (!getToken() || getToken()==''){
 			logout();
 		}
@@ -184,6 +186,21 @@
 	function updateInfoHTML(){
 		updateInfo(appUuid);
 	}
+	
+	function checkAll(){
+		var ischeck = document.getElementById('checkAll');
+		var checkbox = document.getElementsByName('checkbox');
+		if(ischeck.checked){
+			for (var i=0;i<checkbox.length;i++){
+				checkbox[i].checked = true;	
+			}	
+		}else{
+			for (var i=0;i<checkbox.length;i++){
+				checkbox[i].checked = false;	
+			}	
+		}
+	}
+	
 </script>
 </head>
 
@@ -195,8 +212,8 @@
         <ol>
           <li><a href="http://www.easemob.com" target="_blank"><h5>主页</h5></a></li>
           <li><a href="http://developer.easemob.com" target="_blank"><h5>文档</h5></a></li>
-          <li><a href="http://www.easemob.com/faq/" target="_blank"><h5>帮助</h5></a></li>
-          <li><a href="http://www.easemob.com/sdk/" target="_blank"><h5>下载SDK</h5></a></li>
+          <li><a href="http://www.easemob.com/faq.php" target="_blank"><h5>帮助</h5></a></li>
+          <li><a href="http://www.easemob.com/downloads.php" target="_blank"><h5>下载SDK</h5></a></li>
         </ol>
     	</div>
       <ul class="nav ace-nav pull-right">
@@ -241,16 +258,10 @@
         		<li> <a href="javascript:toAppUsersPage()"><font color="green">IM用户</font></a> </li>
       		</ul>
       		<!--&nbsp;&nbsp;&nbsp;&nbsp;
-		    <ul>
+		      <ul>
         		<li> <a href="javascript:togroupAppAdmin()">群组</a> </li>
       		</ul>-->
       		&nbsp;&nbsp;&nbsp;&nbsp;
-      		<!--
-      		<ul>
-        		<li> <a href="javascript:toAppChatroomsPage()">群组管理</a> </li>
-      		</ul>
-      		&nbsp;&nbsp;&nbsp;&nbsp;
-      		-->
       		<ul>
         		<li> <a href="javascript:toAppCredentialsPage()">推送证书</a> </li>
       		</ul>
@@ -297,7 +308,7 @@
 
             <thead>
               <tr>
-								<th></th>
+								<th>全选<input style="opacity:1;" type="checkbox" id="checkAll" onChange="checkAll()"/></th>
 								<th class="hidden-480 text-center"><i></i>用户名</th>
 								<th class="hidden-480 text-center"><i></i>消息提醒</th>
 								<th class="hidden-480 text-center"><i></i>昵称</th>
@@ -337,7 +348,7 @@
 						<div class="control-group">
 							<label class="control-label" for="pwdMondify">新密码：</label>
 							<div class="controls">
-								<input type="password" id="pwdMondify" name="pwdMondify" value="" placeholder="请输入新密码(1位以上字母或数字)" onKeyUp="value=removeAllSpace(value)" onBlur="value=removeAllSpace(value)" />
+								<input type="password" id="pwdMondify" name="pwdMondify" value="" placeholder="请输入新密码(1位以上字母或数字)" onKeyUp="value=removeAllSpace(value)" onBlur="value=removeAllSpace(value)"  onpaste='return false' oncopy='return false' />
 								<input type="hidden" id="usernameMondify" name="usernameMondify" value=""/>
 								<input type="hidden" id="appUuidHidd" name="appUuidHidd" value=""/>
 								<span style="color: red;" id="pwdMondifySpan"></span>
@@ -350,7 +361,7 @@
 						<div class="control-group">
 							<label class="control-label" for="pwdMondifytwo">再次输入新密码：</label>
 							<div class="controls">
-								<input type="password" id="pwdMondifytwo" name="pwdMondifytwo" value="" placeholder="请再次输入新密码" onKeyUp="value=removeAllSpace(value)" onBlur="value=removeAllSpace(value)" />
+								<input type="password" id="pwdMondifytwo" name="pwdMondifytwo" value="" placeholder="请再次输入新密码" onKeyUp="value=removeAllSpace(value)" onBlur="value=removeAllSpace(value)"  onpaste='return false' oncopy='return false' />
 								<span style="color: red;" id="pwdMondifytwoSpan"></span>
 							</div>
 						</div>
@@ -442,7 +453,7 @@
 						</div>
 					</div>
               <div class="control-group" id="notification_time_div">
-							<label class="control-label" for="notification_starttime">免打扰时段(范围:00:00 ~ 23:59)：</label>
+							<label class="control-label" for="notification_starttime">免打扰时段(范围:00 ~ 23)：</label>
 							<div class="controls">
                 <input name="notification_starttime" id="notification_starttime" style="width:60px" type="text" /> --
                 <input name="notification_endtime" id="notification_endtime" style="width:60px" type="text" />

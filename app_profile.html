@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -45,10 +45,18 @@
 <script src="assets/js/management.js"></script>
 <script tyep="text/javascript">
 	var appUuid = getQueryString('appUuid');
+	var Application = getQueryString('Application');
+	if(Application!=null){
+       $.cookie('Application',Application);
+	}
 	if(appUuid == "undefined"){
       appUuid = $.cookie('appName');
 	}
+	if(Application==null){
+       Application = $.cookie('Application');
+	}
 	$(function(){
+	$('#showName').text(Application);
 		if (!getToken() || getToken()==''){
 			logout();
 		}
@@ -60,6 +68,7 @@
 	
 	// 应用概述页
 	function toApppofile(){
+	
 		window.location.href = 'app_profile.html?appUuid='+appUuid;
 	}
 	
@@ -128,8 +137,8 @@
         <ol>
           <li><a href="http://www.easemob.com" target="_blank"><h5>主页</h5></a></li>
           <li><a href="http://developer.easemob.com" target="_blank"><h5>文档</h5></a></li>
-          <li><a href="http://www.easemob.com/faq/" target="_blank"><h5>帮助</h5></a></li>
-          <li><a href="http://www.easemob.com/sdk/" target="_blank"><h5>下载SDK</h5></a></li>
+          <li><a href="http://www.easemob.com/faq.php" target="_blank"><h5>帮助</h5></a></li>
+          <li><a href="http://www.easemob.com/downloads.php" target="_blank"><h5>下载SDK</h5></a></li>
         </ol>
     	</div>
       <ul class="nav ace-nav pull-right">
@@ -263,7 +272,7 @@
 											<div>android:value="<span id="xmlandroidAppkey"></span>" /&gt</div>	
 						      	</a>
 						      </li>
-						     <!-- <li id="iosLi">
+						      <!--<li id="iosLi">
 						      	<a href="javascript:void(0)">
 										  <div>// 向info.plist文件中加入以下配置</div>
 								    	<div>Key:EASEMOB_APPKEY;</div>
@@ -291,8 +300,7 @@
 											<div>&nbsp;</div>
 											<div>&nbsp;</div>
 						      	</a>
-						      </li>
-						      -->
+						      </li>-->
 				    		</ul>
       				</div>
       			</div>

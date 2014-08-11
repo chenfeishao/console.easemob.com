@@ -42,17 +42,45 @@
 <script src="assets/js/ace-elements.min.js"></script>
 <script src="assets/js/ace.min.js"></script>
 <script src="assets/js/management.js"></script>
+<script src="assets/js/layer/layer.min.js"></script>
 <script type="text/javascript">
 	$(function(){
 		if (!getToken() || getToken()==''){
 			logout();
+		}else{
+			getAppList();	
 		}
-		getAppList();	
 	});
 </script>
 </head>
 
 <body>
+<!--<div id="the" style="position:relative;width:300px;height:24px;padding:0 5px;border:1px solid #ff7200;margin:200px auto 0;font:Arial;font-size:12px;z-index:0;overflow:hidden;">
+    <div id="display" style="width:310px;height:24px;line-height:24px;text-align:center;position:absolute;top:0;left:0;z-index:3"></div>
+    <div id="color" style="display:block;width:312px;height:26px;background:#f39;position:absolute;left:-312px;top:0;z-index:2;"></div>
+</div>
+<script type="text/javascript">
+setTimeout("show()",100);
+var box = document.getElementById('display');
+var color = document.getElementById('color');
+var i = 0 ;
+var left = -300 ;
+function show(){
+$("#content").hide();
+	i+=1;
+	left = left+3 ;
+	box.innerHTML = i+"%" ;
+	color.style.left = left +"px" ;
+	if(i<100){
+		setTimeout("show()",100);
+	}
+	if(i==100){
+       $("#the").hide();
+	   $("#content").show();
+	}
+}
+</script>-->
+<!--<div id="content">-->
 <div class="navbar navbar-inverse">
   <div class="navbar-inner">
     <div class="container-fluid"> <a class="brand" href="javascript:void(0);"> <small> <img style="height:45px;" src="assets/images/home_logo.png" alt="管理后台"/> </small> </a>
@@ -60,8 +88,8 @@
         <ol>
           <li><a href="http://www.easemob.com" target="_blank"><h5>主页</h5></a></li>
           <li><a href="http://developer.easemob.com" target="_blank"><h5>文档</h5></a></li>
-          <li><a href="http://www.easemob.com/faq/" target="_blank"><h5>帮助</h5></a></li>
-          <li><a href="http://www.easemob.com/sdk/" target="_blank"><h5>下载SDK</h5></a></li>
+          <li><a href="http://www.easemob.com/faq.php" target="_blank"><h5>帮助</h5></a></li>
+          <li><a href="http://www.easemob.com/downloads.php" target="_blank"><h5>下载SDK</h5></a></li>
         </ol>
     	</div>
       <ul class="nav ace-nav pull-right">
@@ -69,7 +97,7 @@
           <ul id="user_menu" class="pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-closer">
             <li class="divider"></li>
             <li> <a href="admin_home.html"> <i class="icon-user"></i> 账户 </a> </li>
-            <li> <a onclick="logout();" href="javascript:void(0);"> <i class="icon-off"></i> 退出 </a> </li>
+            <li> <a onClick="logout();" href="javascript:void(0);"> <i class="icon-off"></i> 退出 </a> </li>
           </ul>
         </li>
       </ul>
@@ -121,5 +149,6 @@
     </div>
   </div>
 </div>
+<!--</div>-->
 </body>
 </html>

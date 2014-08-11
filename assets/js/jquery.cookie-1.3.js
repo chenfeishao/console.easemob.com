@@ -20,7 +20,6 @@
 	}
 
 	var config = $.cookie = function (key, value, options) {
-
 		// write
 		if (value !== undefined) {
 			options = $.extend({}, config.defaults, options);
@@ -28,7 +27,6 @@
 			if (value === null) {
 				options.expires = -1;
 			}
-
 			if (typeof options.expires === 'number') {
 				var days = options.expires, t = options.expires = new Date();
 				t.setDate(t.getDate() + days);

@@ -74,6 +74,9 @@
 		if($('#rememberme:checked').length>0){
 			$('#username').val($.cookie('tvs-cookies-userName'));
 			$('#password').val($.cookie('tvs-cookies-password'));
+		}else{
+            $('#username').val($.cookie('tvs-cookies-userName'));
+			$('#password').val($.cookie('tvs-cookies-password'));
 		}
 
 		$('#username').focus();
@@ -82,6 +85,11 @@
 		var QSTR = getQueryString('comeFrom');
 		if(QSTR == 'easemobHome'){
 			$('#btnRegist').trigger('click');
+		}
+		var token = $.cookie('access_token');
+		if(token != null && typeof(token)!='undefined'){
+			window.location.href = 'app_list.html';
+			return;
 		}
 		
 	});
@@ -129,6 +137,7 @@ function getBrowser() {
 	
 	// 回车键登录
 	function keyLogin(){
+
 		if(getBrowser() == 'Firefox'){
       //判断IE还是火狐浏览器;
       $("html").die().live("keydown",function(event){     
@@ -315,7 +324,7 @@ function getBrowser() {
 
 </head>
 
-<body class="login-layout" onkeydown="keyLogin();" onload="app_org();">
+<body class="login-layout" onkeydown="keyLogin();" onLoad="app_org();">
 <div id="main-container" class="container-fluid">
   <div id="main-content">
     <div class="row-fluid">
@@ -343,13 +352,13 @@ function getBrowser() {
                         </label>-->
                         <!-- 用户名 -->           
                         <label><span class="block input-icon input-icon-right">
-                          <input type="text" placeholder="用户名" nullmsg="请输入用户名！" datatype="*" class="span12" name="username" id="username" onclick="keyLogin()"/>
+                          <input type="text" placeholder="用户名" nullmsg="请输入用户名！" datatype="*" class="span12" name="username" id="username" onClick="keyLogin()"/>
                           <i class="icon-user"></i> <span class="Validform_checktip"></span></span>
                           <span id="usernameEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <!-- 密码 -->
                         <label> <span class="block input-icon input-icon-right">
-                          <input type="password" nullmsg="请输入密码！" placeholder="密码" class="span12" name="password" id="password" onclick="keyLogin()" />
+                          <input type="password" nullmsg="请输入密码！" placeholder="密码" class="span12" name="password" id="password" onClick="keyLogin()" />
                           <i class="icon-lock"></i> <span class="Validform_checktip"></span></span> 
                           <span id="passwordEMsg" style="font-size:12px;color:red"></span>
                         </label>
@@ -377,19 +386,19 @@ function getBrowser() {
                             <input type="checkbox" checked="true" name="rememberme" id="rememberme">
                             <span class="lbl">记住我</span>
                           </div>
-                          <button id="loginBtn" class="span4 btn btn-small btn-primary" onclick="login();"> <i class="icon-key"></i> <span id="cont">登录</span> </button>
+                          <button id="loginBtn" class="span4 btn btn-small btn-primary" onClick="login();"> <i class="icon-key"></i> <span id="cont">登录</span> </button>
                         </div>
                       </fieldset>
                   </div>
                   <div class="toolbar clearfix">
                   	<div>
-											<a href="javascript:void(0);" onclick="show_box('forgot-box'); return false;" class="forgot-password-link">
+											<a href="javascript:void(0);" onClick="show_box('forgot-box'); return false;" class="forgot-password-link">
 												<i class="icon-arrow-left"></i>
 												忘记密码？
 											</a>
 										</div>
 										<div>
-											<a href="javascript:void(0);" id="btnRegist" onclick="show_box('signup-box'); return false;" class="forgot-password-link">
+											<a href="javascript:void(0);" id="btnRegist" onClick="show_box('signup-box'); return false;" class="forgot-password-link">
 												去注册
 												<i class="icon-arrow-right"></i>
 											</a>
@@ -412,11 +421,11 @@ function getBrowser() {
                           <span id="emailEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <div class="row-fluid">
-                        	<a class="span5 offset7 btn btn-small btn-danger" onclick="resetPasswd();"> <i class="icon-lightbulb"></i> 找回!</a>
+                        	<a class="span5 offset7 btn btn-small btn-danger" onClick="resetPasswd();"> <i class="icon-lightbulb"></i> 找回!</a>
                         </div>
                       </fieldset>
                   </div>
-                  <div class="toolbar center"> <a class="back-to-login-link" onclick="show_box('login-box'); return false;" href="javascript:void(0);"> 返回登录 <i class="icon-arrow-right"></i> </a> </div>
+                  <div class="toolbar center"> <a class="back-to-login-link" onClick="show_box('login-box'); return false;" href="javascript:void(0);"> 返回登录 <i class="icon-arrow-right"></i> </a> </div>
                 </div>
               </div>
               
@@ -429,30 +438,30 @@ function getBrowser() {
                     <p> 请详细输入您的信息: </p>
                       <fieldset>
                       	<label> <span class="block input-icon input-icon-right">
-                          <input type="text" id="regOrgName" name="regOrgName" placeholder="企业ID" class="span12" onblur="onBlurRegOrgNameCheck()" value="" onkeyup="value=value.replace(/[\uFF00-\uFFFF]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\uFF00-\uFFFF]/g,''))" />
+                          <input type="text" id="regOrgName" name="regOrgName" placeholder="企业ID" class="span12" onBlur="onBlurRegOrgNameCheck()" value="" onKeyUp="value=value.replace(/[\uFF00-\uFFFF]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\uFF00-\uFFFF]/g,''))" />
                           <i class="icon-home"></i></span>
                           <span id="regOrgNameSMsg" style="font-size:12px">3~18个字符，可使用字母,数字,横线,不能以横线开头</span>
                           <span id="regOrgNameEMsg" style="font-size:12px;color:red"></span>
                         </label>
                       	<label> <span class="block input-icon input-icon-right">
-                          <input type="text" id="regUserName" placeholder="用户名" class="span12" name="regUserName" value="" onblur="onBlurRegUserNameCheck()">
+                          <input type="text" id="regUserName" placeholder="用户名" class="span12" name="regUserName" value="" onBlur="onBlurRegUserNameCheck()">
                           <i class="icon-user"></i></span>
                           <span id="regUserNameSMsg" style="font-size:12px">1~18个字符，可使用字母、数字</span>
                           <span id="regUserNameEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label> <span class="block input-icon input-icon-right">
-                          <input type="password" id="regPassword" placeholder="密码" class="span12" name="regPassword" value="" onblur="onBlurRegPasswordCheck()">
+                          <input type="password" id="regPassword" placeholder="密码" class="span12" name="regPassword" value="" onBlur="onBlurRegPasswordCheck()">
                           <i class="icon-lock"></i> </span>
                           <span id="regPasswordSMsg" style="font-size:12px">6~20个字符，区分大小写</span>
                           <span id="regPasswordEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label> <span class="block input-icon input-icon-right">
-                          <input type="password" id="regRePassword" placeholder="重复密码" class="span12" name="regRePassword" value="" onblur="onBlurRegRePasswordCheck()" />
+                          <input type="password" id="regRePassword" placeholder="重复密码" class="span12" name="regRePassword" value="" onBlur="onBlurRegRePasswordCheck()" />
                           <i class="icon-lock"></i> </span>
                           <span id="regRePasswordEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label> <span class="block input-icon input-icon-right">
-                          <input type="text" id="regEmail" placeholder="电子邮件" size="48px" class="span12" name="regEmail" value="" onblur="onBlurRegEmailCheck()">
+                          <input type="text" id="regEmail" placeholder="电子邮件" size="48px" class="span12" name="regEmail" value="" onBlur="onBlurRegEmailCheck()">
                           <i class="icon-envelope"></i></span>
                           <span id="regEmailSEMsg" style="font-size:12px;"></span>
                           <span id="regEmailEMsg" style="font-size:12px;color:red"></span>
@@ -474,7 +483,7 @@ function getBrowser() {
                           <span id="regCompanyNameEMsg" style="font-size:12px;color:red"></span>
                         </label>
                         <label><span class="block input-icon input-icon-right">
-                          <input type="text" id="regTel" placeholder="联系电话" class="span12" name="regTel" value="" onblur="onBlurRegTelCheck()">
+                          <input type="text" id="regTel" placeholder="联系电话" class="span12" name="regTel" value="" onBlur="onBlurRegTelCheck()">
                           <i class="icon-dashboard" style="z-index:0;"></i></span>
                           <span id="regTelSEMsg" style="font-size:12px;">固话或者移动电话号码</span>
                           <span id="regTelEMsg" style="font-size:12px;color:red"></span>
@@ -485,12 +494,12 @@ function getBrowser() {
                         </label>
                         <div class="space-24"></div>
                         <div class="row-fluid">
-                          <button class="span6 btn btn-small" id="resetForm" onclick="resetForm()"> <i class="icon-refresh"></i> 重新填写 </button>
-                          <button class="span6 btn btn-small" id="formSubBtn" onclick="formSubmit();"> 注册 <i class="icon-arrow-right icon-on-right"></i> </button>
+                          <button class="span6 btn btn-small" id="resetForm" onClick="resetForm()"> <i class="icon-refresh"></i> 重新填写 </button>
+                          <button class="span6 btn btn-small" id="formSubBtn" onClick="formSubmit();"> 注册 <i class="icon-arrow-right icon-on-right"></i> </button>
                         </div>
                       </fieldset>
                   </div>
-                  <div class="toolbar center"> <a class="back-to-login-link" onclick="clearBox();show_box('login-box');" href="javascript:void(0);"> <i class="icon-arrow-left"></i> 返回登录 </a> </div>
+                  <div class="toolbar center"> <a class="back-to-login-link" onClick="clearBox();show_box('login-box');" href="javascript:void(0);"> <i class="icon-arrow-left"></i> 返回登录 </a> </div>
                 </div>
               </div>
             </div>

@@ -72,11 +72,6 @@
 		window.location.href = 'app_users.html?appUuid='+appUuid;
 	}
 	
-	// 群组管理页
-	//function toAppChatroomsPage(){
-		//window.location.href = 'app_chatrooms.html?appUuid='+appUuid;
-	//}
-	
 	// 群组页面
 	function togroupAppAdmin(){
 		window.location.href = 'app_group.html?appUuid=' + appUuid;
@@ -129,8 +124,8 @@
         <ol>
           <li><a href="http://www.easemob.com" target="_blank"><h5>主页</h5></a></li>
           <li><a href="http://developer.easemob.com" target="_blank"><h5>文档</h5></a></li>
-          <li><a href="http://www.easemob.com/faq/" target="_blank"><h5>帮助</h5></a></li>
-          <li><a href="http://www.easemob.com/sdk/" target="_blank"><h5>下载SDK</h5></a></li>
+          <li><a href="http://www.easemob.com/faq.php" target="_blank"><h5>帮助</h5></a></li>
+          <li><a href="http://www.easemob.com/downloads.php" target="_blank"><h5>下载SDK</h5></a></li>
         </ol>
     	</div>
       <ul class="nav ace-nav pull-right">
@@ -174,10 +169,11 @@
       		<ul>
         		<li> <a href="javascript:toAppUsersPage()">IM用户</a> </li>
       		</ul>
-      		&nbsp;&nbsp;&nbsp;&nbsp;
+      		<!--&nbsp;&nbsp;&nbsp;&nbsp;
 			 		<ul>
         		<li> <a href="javascript:togroupAppAdmin()">群组</a> </li>
       		</ul>
+      		-->
       		&nbsp;&nbsp;&nbsp;&nbsp;
       		<ul>
         		<li> <a href="javascript:toAppCredentialsPage()">推送证书</a> </li>
@@ -218,7 +214,7 @@
 			                    <div class="control-group">
 			                      <label for="appName" class="control-label">密码：</label>
 			                      <div class="controls">
-			                      	<input type="password" id="password" name="password" value="" onkeyup="value=removeAllSpace(value)" onblur="value=removeAllSpace(value);onBlurCheckPassword(this.value)" />
+			                      	<input type="password" id="password" name="password" value="" onkeyup="value=removeAllSpace(value)" onblur="value=removeAllSpace(value);onBlurCheckPassword(this.value)" onpaste='return false' oncopy='return false' />
 			                      	<span style="color:red">*&nbsp;</span>
 			                      	<span id="passwordMsg" style="color:red"></span>
 			                      </div>
@@ -230,7 +226,7 @@
 			                    <div class="control-group">
 			                      <label for="appName" class="control-label">确认密码：</label>
 			                      <div class="controls">
-			                      	<input type="password" id="confirmPassword" name="confirmPassword" value="" onkeyup="value=removeAllSpace(value)" onblur="value=removeAllSpace(value);onBlurCheckConfirmPassword(this.value)" />
+			                      	<input type="password" id="confirmPassword" name="confirmPassword" value="" onkeyup="value=removeAllSpace(value)" onblur="value=removeAllSpace(value);onBlurCheckConfirmPassword(this.value)" onpaste='return false' oncopy='return false' />
 			                      	<span style="color:red">*&nbsp;</span>
 			                      	<span id="confirmPasswordMsg" style="color:red"></span>
 			                      </div>
