@@ -930,7 +930,7 @@ function saveNewApp(){
 				url:baseUrl+'/management/organizations/'+ orgName +'/applications',
 				type:'POST',
 				headers:{
-					'Authorization':'Bearer '+access_token,
+					'Authorization':'Bearer ' + access_token,
 					'Content-Type':'application/json'
 				},
 				data:JSON.stringify(dataBody),
@@ -964,7 +964,7 @@ function updateChatroomPageStatus(appUuid){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		$.ajax({
 			url:baseUrl+'/'+ orgName +'/' + appUuid + '/chatrooms?limit=1000',
@@ -1008,7 +1008,7 @@ function updateUsersPageStatus(){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		$.ajax({
 			url:baseUrl+'/'+ orgName +'/' + appUuid + '/users?limit=1000',
@@ -1065,7 +1065,7 @@ function updateUsersAdminPageStatus(){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		$.ajax({
 			url:baseUrl+'/'+ orgName +'/' + appUuid +'/roles/admin/users?limit=1000',
@@ -1121,7 +1121,7 @@ function updateIMPageStatus(owner_username){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		$.ajax({
 			url:baseUrl+'/'+ orgName +'/' + appUuid + '/users/'+owner_username+'/contacts/users?limit=1000',
@@ -1177,7 +1177,7 @@ function getAppList(){
 	userCount = 0;
 	if(!access_token || access_token=='') {
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		var layerNum = layer.load('正在读取数据...');
 		$.ajax({
@@ -1279,7 +1279,7 @@ function getAppProfile(appUuid){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		// 获取app基本信息
 		$.ajax({
@@ -1324,6 +1324,35 @@ function getAppProfile(appUuid){
 			}
 		});
 		
+		/**
+		$.ajax({
+			url: baseUrl + '/' + orgName + '/' + appUuid + '/credentials',
+			type:'GET',
+			headers:{
+				'Authorization':'Bearer ' + access_token,
+				'Content-Type':'application/json'
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+			},
+			success: function(respData, textStatus, jqXHR) {
+				$('#client_id').text(respData.credentials.client_id);
+				$('#client_secret').text(respData.credentials.client_secret);
+			}
+		});
+		*/
+	}
+}
+
+// 获取app Credential:org管理员登录
+function getAppClients(appUuid){
+	// 获取token
+	var access_token = $.cookie('access_token');
+	var cuser = $.cookie('cuser');
+	var orgName = $.cookie('orgName');
+	if(!access_token || access_token==''){
+		alert('提示\n\n会话已失效,请重新登录!');
+		window.location.href = 'index.html';
+	} else {
 		// 获取app credential
 		//http://a1.easemob.com:80/management/organizations/belo/applications/myapptest/credentials
 		
@@ -1344,7 +1373,6 @@ function getAppProfile(appUuid){
 		
 	}
 }
-
 
 //修改缩略图大小
 function updateImage(appUuid){
@@ -1391,7 +1419,7 @@ function getAppProfileforAppAdmin(appUuid){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		$.ajax({
 			url:baseUrl+'/management/organizations/'+ orgName +'/applications/' + appUuid,
@@ -1630,7 +1658,7 @@ function getAppUserList(appUuid, pageAction){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		var layerNum = layer.load('正在加载数据...');
 		var userPage = $.cookie('userPage');
@@ -1714,7 +1742,6 @@ function getAppUserList(appUuid, pageAction){
 										  '<li data-filter-camera-type="Zed"><a href="javascript:showUpdateInfo(\''+appUuid+'\',\''+username+'\')">修改信息</a></li>'+
 										  '<li data-filter-camera-type="Zed"><a href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a></li>'+
 										  '<li data-filter-camera-type="Zed"><a href="javascript:sendMessgeOne(\''+appUuid+'\',\''+username+'\')">发送消息</a></li>'+
-										  
 											'</ul>'+
 										'</li>'+
 									'</ul>'+
@@ -1735,7 +1762,29 @@ function getAppUserList(appUuid, pageAction){
 						$(pageLi[i]).hide();
 					}
 				} else {
-					updateUsersPageStatus();	
+				
+				// 20140810 liwei add
+				var ulB = '<ul>';
+				var ulE = '</ul>';
+				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
+				var textOp2 = '<li> <a href="javascript:void(0);" onclick="getNextAppUserList();">下一页</a> </li>';
+				$('#paginau').html('');
+					
+				// 首页
+				if(pageNo == 1){
+					if(respData.cursor == null){
+						$('#paginau').append(ulB + ulE);
+					} else {
+						$('#paginau').append(ulB + textOp2 + ulE);
+					}
+					// 尾页
+				} else if(cursors.length != 0 && respData.cursor == null){
+					$('#paginau').append(ulB + textOp1 + ulE);
+				} else {
+					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
+				}
+					
+				//updateUsersPageStatus();
 				}
 			}
 		});
@@ -2325,7 +2374,7 @@ function getAppChatrooms(appUuid,pageAction){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		if('forward' == pageAction){
 			pageNo += 1;
@@ -2457,7 +2506,7 @@ function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		if('forward' == pageAction){
 			pageNo += 1;
@@ -2579,7 +2628,7 @@ function getAppChatroomsuser(appUuid,groupid,pageAction){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		if('forward' == pageAction){
 			pageNo += 1;
@@ -2766,7 +2815,6 @@ function addIMFriendusers(){
 					}
 				}
 		});
-	
 		
 	}
 	
@@ -2868,7 +2916,7 @@ function updatequnzuPageStatus(){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		$.ajax({
 			url:baseUrl+'/'+ orgName +'/' + appUuid + '/notifiers?limit=1000',
@@ -2913,8 +2961,6 @@ function updatequnzuPageStatus(){
 		});
 	}
 }
-
-
 
 // 查询证书信息
 function getAppCredentials(appUuid, pageAction){
@@ -3039,7 +3085,7 @@ function getAppIMList(appUuid, owner_username){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		var layerNum = layer.load('正在加载数据...');
 		$.ajax({
@@ -3101,7 +3147,7 @@ function deleteAppIMFriend(appUuid, owner_username, friend_username){
 	var access_token = $.cookie('access_token');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		if(window.confirm('确定删除此好友？')){
 			$.ajax({
@@ -3190,7 +3236,7 @@ function getAppUsersAdminList(appUuid, pageAction){
 	var orgName = $.cookie('orgName');
 	if(!access_token || access_token==''){
 		alert('提示\n\n会话已失效,请重新登录!');
-		window.location.href = 'login.html';
+		window.location.href = 'index.html';
 	} else {
 		if('next' == pageAction){
 			pageNo += 1;

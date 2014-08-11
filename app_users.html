@@ -48,12 +48,13 @@
 	var appUuid = getQueryString('appUuid');
 	var Application = $.cookie('Application');
 	$(function(){
-	    $('#showName').text(Application);
+	  $('#showName').text(Application);
 		if (!getToken() || getToken()==''){
 			logout();
 		}
 		
 		getAppProfile(appUuid);
+		
 		getAppUserList(appUuid);
 		
 		$('#searchForm').submit(function(){
@@ -305,10 +306,9 @@
         <div class="row-fluid">
 		<!--table table-striped table-bordered table-hover-->
   	<table class="table table-striped table-bordered table-hover" >
-
             <thead>
               <tr>
-								<th>全选<input style="opacity:1;" type="checkbox" id="checkAll" onChange="checkAll()"/></th>
+								<th>全选 <input style="opacity:1;" type="checkbox" id="checkAll" onChange="checkAll()"/></th>
 								<th class="hidden-480 text-center"><i></i>用户名</th>
 								<th class="hidden-480 text-center"><i></i>消息提醒</th>
 								<th class="hidden-480 text-center"><i></i>昵称</th>
