@@ -901,7 +901,7 @@ function createAppFormValidate(){
 	$('#appDescMsg').text('输入正确！');
 	$('#appDescMsg').css('color','blue');
  	
-	return false;
+	return true;
 }
 
 // 创建app
