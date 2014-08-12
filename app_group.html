@@ -43,6 +43,7 @@
 <script src="assets/js/ace.min.js"></script>
 <script src="assets/js/jquery.form.js"></script>
 <script src="assets/js/management.js"></script>
+<script src="assets/js/layer/layer.min.js"></script>
 <script tyep="text/javascript">
 	var appUuid = getQueryString('appUuid');
 	$(function(){
@@ -58,7 +59,6 @@
 				return false;
 		});
 	});	
-	
 	// 上一页数据
 	function getPrevAppUserList(){
 		getAppUserList(appUuid,'forward');
@@ -131,9 +131,9 @@
 	function sendMessage(){
 		var img = document.getElementById('img1');
 		if(img == null ){
-			sendUserMessage();
+			sendUserMessages();
 		}else{
-			sendUserImgMessage();
+			sendUserImgMessages();
 		}
 	}
 	//添加群组
@@ -168,7 +168,8 @@
 	}	
 	function imgMessage(){
 		var img = $('#file').val().substr( $('#file').val().lastIndexOf('.')+1);
-		if(img == 'jpg'|| img == 'png'|| img == 'bmp'|| img =='gif' || img == 'jpeg'){
+		img = img.toLowerCase();
+		if(img == 'jpg'|| img == 'png'|| img == 'bmp'|| img =='gif' || img == 'jpeg' ){
 		  var access_token = $.cookie('access_token');
 		  var orgName = $.cookie('orgName');
 		  var ajax_option = {
@@ -181,18 +182,19 @@
 			},
 			success:function(respData){
 			document.getElementById('messegeContent').style.display="none";
-				$('#div1').append('<img id="img1" src="'+respData.uri+'/'+respData.entities[0].uuid+'" />');
-					var str = $('#file').val()+","+respData.entities[0]['share-secret'];
-					$('#share-secret').val(str);
+				$('#div1').append('<img id="img1" src="'+baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid+'" />');
+				var str = $('#file').val()+","+respData.entities[0]['share-secret'];
+				$('#share-secret').val(str);
 				},
-					error:function(respData){
+				error:function(respData){
 				}
-			}
+				}
 
 				$('#myForm').ajaxSubmit(ajax_option);
-		}else{
-		alert('此文件不是图片！请选择图片');
-		}
+				}else{
+				alert('此文件不是图片！请选择图片');
+				}
+
 	}
 </script>
 </head>
@@ -205,8 +207,8 @@
         <ol>
           <li><a href="http://www.easemob.com" target="_blank"><h5>主页</h5></a></li>
           <li><a href="http://developer.easemob.com" target="_blank"><h5>文档</h5></a></li>
-          <li><a href="http://www.easemob.com/faq/" target="_blank"><h5>帮助</h5></a></li>
-          <li><a href="http://www.easemob.com/sdk/" target="_blank"><h5>下载SDK</h5></a></li>
+          <li><a href="http://www.easemob.com/faq.php" target="_blank"><h5>帮助</h5></a></li>
+          <li><a href="http://www.easemob.com/downloads.php" target="_blank"><h5>下载SDK</h5></a></li>
         </ol>
     	</div>
       <ul class="nav ace-nav pull-right">
@@ -250,11 +252,11 @@
       		<ul>
         		<li> <a href="javascript:toAppUsersPage()">IM用户</a> </li>
       		</ul>
-      		<!--&nbsp;&nbsp;&nbsp;&nbsp;
+      		&nbsp;&nbsp;&nbsp;&nbsp;
       		<ul>
         		<li> <a href="javascript:togroupAppAdmin()"><font color="green">群组</font></a> </li>
       		</ul>
-      		-->
+      		
       		&nbsp;&nbsp;&nbsp;&nbsp;
       		<ul>
         		<li> <a href="javascript:toAppCredentialsPage()">推送证书</a> </li>
@@ -289,7 +291,7 @@
       		</ul>
 					<form id="searchForm" action="#" class="form-search pull-right">
 						<div class="input-append">
-							<input class="m-wrap" value="" id="qunzuid" type="text" placeholder="输入完整群组名" />
+							<input class="m-wrap" value="" id="qunzuid" type="text" placeholder="输入完整群组ID" />
 							<button class="btn green" id="searchBtn" onClick="shousuoqunzu()" type="button">搜索</button>
 							<input value="" id="userInboxBak" type="hidden" />
 						</div>
@@ -383,9 +385,9 @@
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="control-group">
-							<label class="control-label" for="pwdMondifytwo">群组管理员：</label>
+							<label class="control-label" for="pwdMondifytwo">群主：</label>
 							<div class="controls">
-								<input type="text" id="qunzuguan" name="qunzuguan" value="" placeholder="请输入群组管理员账号" />
+								<input type="text" id="qunzuguan" name="qunzuguan" value="" placeholder="请输入群主账号" />
 								<span style="color: red;" id="pwdMondifytwoSpan"></span>
 							</div>
 						</div>

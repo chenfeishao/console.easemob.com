@@ -137,7 +137,9 @@ function getBrowser() {
 	
 	// 回车键登录
 	function keyLogin(){
-
+		if(!$('#login-box').hasClass('visible')){
+			return;	
+		}
 		if(getBrowser() == 'Firefox'){
       //判断IE还是火狐浏览器;
       $("html").die().live("keydown",function(event){     

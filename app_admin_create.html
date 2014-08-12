@@ -50,7 +50,7 @@
 		}
 		
 		getAppProfile(appUuid);
-		//getAppUserList(appUuid);
+		getAppUserList(appUuid);
 	});	
 	
 	// 上一页数据
@@ -124,8 +124,8 @@
         <ol>
           <li><a href="http://www.easemob.com" target="_blank"><h5>主页</h5></a></li>
           <li><a href="http://developer.easemob.com" target="_blank"><h5>文档</h5></a></li>
-          <li><a href="http://www.easemob.com/faq/" target="_blank"><h5>帮助</h5></a></li>
-          <li><a href="http://www.easemob.com/sdk/" target="_blank"><h5>下载SDK</h5></a></li>
+          <li><a href="http://www.easemob.com/faq.php" target="_blank"><h5>帮助</h5></a></li>
+          <li><a href="http://www.easemob.com/downloads.php" target="_blank"><h5>下载SDK</h5></a></li>
         </ol>
     	</div>
       <ul class="nav ace-nav pull-right">
@@ -156,7 +156,9 @@
     <div id="breadcrumbs">
       <ul class="breadcrumb">
         <li> <i class="icon-home"></i> 我的应用 <span class="divider"> <i class="icon-angle-right"></i> </span> </li>
-        <li> <a href="javascript:void(0);" target="_self"> <span id="showName"></span></a></li>
+        <li> <a href="javascript:void(0);" target="_self"> <span id="showName"></span></a><span class="divider"> <i class="icon-angle-right"></i> </span></li>
+        <li> <a href="javascript:void(0);" target="_self"> <span>App管理员</span></a><span class="divider"> <i class="icon-angle-right"></i> </span></li>
+        <li> <a href="javascript:void(0);" target="_self"> <span>创建App管理员</span></a></li>
       </ul>
     </div>
     <div class="clearfix" id="page-content">
@@ -184,7 +186,7 @@
       		</ul>
       		&nbsp;&nbsp;&nbsp;&nbsp;
       		<ul>
-        		<li> <a href="javascript:toAppUserAdmin()"><font color="green">App管理员</font></></a> </li>
+        		<li> <a href="javascript:toAppUserAdmin()"><font color="green">App管理员</font></a> </li>
       		</ul>
       		
       		<hr/>
@@ -196,9 +198,9 @@
             <tbody id="appListBody">
             	<div class="widget-body">
 			<div class="widget-main no-padding">
-				<div style="padding-top:20px;">创建app管理员</>
-			  <div class="form-horizontal" style="padding-top:20px;">
-			              	<div class="row-fluid">
+				
+			  <div class="form-horizontal" style="padding-top:30px;">
+			                <div class="row-fluid">
 			                  <div class="span12">
 			                    <div class="control-group">
 			                      <label for="appName" class="control-label">用户名：</label>

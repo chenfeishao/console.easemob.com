@@ -48,13 +48,12 @@
 	var appUuid = getQueryString('appUuid');
 	var Application = $.cookie('Application');
 	$(function(){
-	  $('#showName').text(Application);
+	    $('#showName').text(Application);
 		if (!getToken() || getToken()==''){
 			logout();
 		}
 		
 		getAppProfile(appUuid);
-		
 		getAppUserList(appUuid);
 		
 		$('#searchForm').submit(function(){
@@ -213,8 +212,8 @@
         <ol>
           <li><a href="http://www.easemob.com" target="_blank"><h5>主页</h5></a></li>
           <li><a href="http://developer.easemob.com" target="_blank"><h5>文档</h5></a></li>
-          <li><a href="http://www.easemob.com/faq/" target="_blank"><h5>帮助</h5></a></li>
-          <li><a href="http://www.easemob.com/sdk/" target="_blank"><h5>下载SDK</h5></a></li>
+          <li><a href="http://www.easemob.com/faq.php" target="_blank"><h5>帮助</h5></a></li>
+          <li><a href="http://www.easemob.com/downloads.php" target="_blank"><h5>下载SDK</h5></a></li>
         </ol>
     	</div>
       <ul class="nav ace-nav pull-right">
@@ -258,10 +257,10 @@
       		<ul>
         		<li> <a href="javascript:toAppUsersPage()"><font color="green">IM用户</font></a> </li>
       		</ul>
-      		<!--&nbsp;&nbsp;&nbsp;&nbsp;
+      		&nbsp;&nbsp;&nbsp;&nbsp;
 		      <ul>
         		<li> <a href="javascript:togroupAppAdmin()">群组</a> </li>
-      		</ul>-->
+      		</ul>
       		&nbsp;&nbsp;&nbsp;&nbsp;
       		<ul>
         		<li> <a href="javascript:toAppCredentialsPage()">推送证书</a> </li>
@@ -306,9 +305,10 @@
         <div class="row-fluid">
 		<!--table table-striped table-bordered table-hover-->
   	<table class="table table-striped table-bordered table-hover" >
+
             <thead>
               <tr>
-								<th>全选 <input style="opacity:1;" type="checkbox" id="checkAll" onChange="checkAll()"/></th>
+								<th>全选<input style="opacity:1;" type="checkbox" id="checkAll" onChange="checkAll()"/></th>
 								<th class="hidden-480 text-center"><i></i>用户名</th>
 								<th class="hidden-480 text-center"><i></i>消息提醒</th>
 								<th class="hidden-480 text-center"><i></i>昵称</th>
