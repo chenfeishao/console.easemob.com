@@ -873,7 +873,7 @@ function createAppFormValidate(){
 	}
 	var appNameRegex = /^[0-9a-zA-Z]*$/;
 	if(!appNameRegex.test(appName)){
-		$('#appNameMsg').text('应用名称只能是字母,数字或字母数字组合!');
+		$('#appNameMsg').text('作为环信体系中的一个app唯一标识,只能是字母,数字或字母数字组合!');
 		$('#appNameMsg').css('color','red');
  		$('#appName').focus();
 		return false;
@@ -883,7 +883,7 @@ function createAppFormValidate(){
  	
  	var nickRegex = /^[0-9a-zA-Z-_\u4e00-\u9faf]*$/;
  	if(!nickRegex.test(nick)){
-		$('#nickMsg').text('产品名称只能是汉字,字母,数字、横线、下划线及其组合!');
+		$('#nickMsg').text('您的这款app对应的产品叫什么? 只能是汉字,字母,数字、横线、下划线及其组合!');
 		$('#nickMsg').css('color','red');
  		$('#nick').focus();
 		return false;
