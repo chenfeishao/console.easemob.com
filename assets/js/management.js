@@ -2157,7 +2157,7 @@ function sendUserMessage(){
 function sendUserImgMessage(){
 	if( $('#share-secret').val() == ''|| $('#share-secret').val() == null){
 		alert('请先选择图片');	
-	}else{
+	} else {
 		var users = document.getElementById('usernameMessage').value;
 		var appUuid = document.getElementById('appUuidMessage').value;
 		var orgName = $.cookie('orgName');
@@ -2168,12 +2168,9 @@ function sendUserImgMessage(){
 		var d = {
 		  "target_type" : "users", //or chatgroups
 		  "target" : target, //注意这里需要用数组, 即使只有一个用户, 也要用数组 ['u1']
-		  
 		  "msg" : {
-			  "type" : "img",
-			  },
-		"filename":str[0],
-		"secret": str[1]
+			  "type":"img","filename":str[0], "secret": str[1],"url":$('#imgUuid').val()
+	           }
 		 }
 		 var layerNum = layer.load('正在发送...');
 		 $.ajax({
