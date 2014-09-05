@@ -2376,14 +2376,11 @@ function sendUserImgMessages(){
 		var target = users.split(',');
 		var str = $('#share-secret').val().split(',');
 		var d = {
-		  "target_type" : "chatgroups", //or chatgroups
+		  "target_type" : "chatgroups",
 		  "target" : target, //注意这里需要用数组, 即使只有一个用户, 也要用数组 ['u1']
-		  
-		  "msg" : {
-			  "type" : "img",
-			  },
-		"filename":str[0],
-		"secret": str[1]
+		   "msg" : {
+			  "type":"img","filename":str[0], "secret": str[1],"url":$('#imgUuid').val()
+	           }
 		 }
 		 var layerNum = layer.load('正在发送...');
 		 $.ajax({
