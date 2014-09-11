@@ -2647,7 +2647,7 @@ function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
 }
 // 查看群组成员
 function togroupaddAppAdminuserusers(appUuid,groupid){
-	window.location.href = 'app_qunzu_list.html?appUuid=' + appUuid + '&groupid=' + groupid;
+	window.location.href = 'app_chatgroup_users.html?appUuid=' + appUuid + '&groupid=' + groupid;
 }
 	
 // 获取群组成员列表
@@ -2684,7 +2684,7 @@ function getAppChatroomsuser(appUuid,groupid,pageAction){
 			success:function(respData){
 				// 缓存游标,下次next时候存新的游标
 				if(pageAction!='forward'){
-					cursors[pageNo+1] =	respData.cursor;
+					cursors[pageNo+1] = respData.cursor;
 				} else {
 					cursors[pageNo+1] = null;
 				}
@@ -2699,10 +2699,9 @@ function getAppChatroomsuser(appUuid,groupid,pageAction){
 					$(respData.data).each(function(){
 						
 						var members = this.member;
-						var owner=this.owner;
+						var owner = this.owner;
 						if(members != undefined){
 							
-							// 20170802 李伟 add
 							var selectOptions = '<tr>'+
 								'<td class="text-center">'+members+'</td>'+
 								'<td class="text-center">'+
@@ -2720,23 +2719,14 @@ function getAppChatroomsuser(appUuid,groupid,pageAction){
 						}else if(owner !=undefined){
 							$.cookie('owner',owner);
 							
-							// 20170802 李伟 add
 							var selectOptions = '<tr>'+
-								'<td class="text-center" style="color:#FF0000;">'+owner+'</td>'+
-								'<td class="text-center">'+
-									'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
-									'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
-									//	'<ul class="dropdown-menu" style="left:200px">'+
-									//'<li><a href="javascript:deleteAppChatroomUsers(\''+appUuid+'\',\''+groupid+'\',\''+members+'\')">移除</a></li>'+
-									//	'</ul>'+
-									'</li>'+
-								'</ul>'+
+								'<td class="text-center" style="color:#FF0000;"><i class="icon-user"></i>&nbsp;'+owner+'</td>'+
+								'<td class="text-center">对群主禁用'+
 								'</td>'+
 							'</tr>';
 							
 							$('#appIMBody').append(selectOptions);
 						}
-							//i++;
 					});
 				}
 				var tbody = document.getElementsByTagName("tbody")[0];
@@ -2859,17 +2849,18 @@ function addqunzuFriendusers(appUuid,qunzuname,qunzumiaosu,approval,publics,qunz
 	//var appUuid = $('#appUuidFriend').val();
 	var friend_username = $('#friendUsername').val();
 	var qun={
-    "groupname":qunzuname,
-    "desc":qunzumiaosu, 
-    "public":publics, 
-   // "approval":approval, 
-    "owner":qunzuguan
-}; 
+	    "groupname":qunzuname,
+	    "desc":qunzumiaosu, 
+	    "public":publics, 
+	   // "approval":approval, 
+	    "owner":qunzuguan
+	}; 
+
 	if(publics==true){
-       qun.approval=approval;
+	    qun.approval=approval;
 	}
 	if (qunzuname == ''){
-		alert('群组名称不能为空!');	
+	    alert('群组名称不能为空!');	
 	}else if(qunzumiaosu==''){
 	    alert('群组描述不能为空');
 	}else if(qunzuguan==''){
@@ -2878,7 +2869,7 @@ function addqunzuFriendusers(appUuid,qunzuname,qunzumiaosu,approval,publics,qunz
 		$.ajax({
 				url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups',
 				type:'POST',
-			    data:JSON.stringify(qun),
+			    	data:JSON.stringify(qun),
 				headers:{
 					'Authorization':'Bearer '+access_token,
 					'Content-Type':'application/json'
