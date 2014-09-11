@@ -2700,8 +2700,19 @@ function getAppChatroomsuser(appUuid,groupid,pageAction){
 						
 						var members = this.member;
 						var owner = this.owner;
-						if(members != undefined){
+						if(owner !=undefined){
+							$.cookie('owner',owner);
 							
+							var selectOptions = '<tr>'+
+								'<td class="text-center" style="color:#FF0000;"><i class="icon-user"></i>&nbsp;'+owner+'</td>'+
+								'<td class="text-center">对群主禁用'+
+								'</td>'+
+							'</tr>';
+							
+							$('#appIMBody').append(selectOptions);
+						} 
+						
+						if(members != undefined) {
 							var selectOptions = '<tr>'+
 								'<td class="text-center">'+members+'</td>'+
 								'<td class="text-center">'+
@@ -2716,16 +2727,6 @@ function getAppChatroomsuser(appUuid,groupid,pageAction){
 							'</tr>';
 							$('#appIMBody').append(selectOptions);
 							
-						}else if(owner !=undefined){
-							$.cookie('owner',owner);
-							
-							var selectOptions = '<tr>'+
-								'<td class="text-center" style="color:#FF0000;"><i class="icon-user"></i>&nbsp;'+owner+'</td>'+
-								'<td class="text-center">对群主禁用'+
-								'</td>'+
-							'</tr>';
-							
-							$('#appIMBody').append(selectOptions);
 						}
 					});
 				}

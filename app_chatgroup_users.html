@@ -64,6 +64,8 @@
 		var groupid=getQueryString('groupid');
 		
 		getAppChatroomsuser(appUuid,groupid);
+
+		$("#groupName").text(groupid);
 	});
 		//删除选定的用户
 	function deleteAppUsersBox(){
@@ -166,7 +168,7 @@
   <div class="clearfix" id="main-content">
     <div id="breadcrumbs">
       <ul class="breadcrumb">
-        <li> <i class="icon-home"></i>  我的应用 &nbsp; </li><li><span class="divider"> <i class="icon-angle-right"></i> </span>&nbsp;<a href="javascript:toApppofile()"><span id="showName"></span></a>&nbsp;</li><li><span class="divider"> <i class="icon-angle-right"></i> </span>&nbsp;IM用户</span>&nbsp;</li><li><span class="divider"> <i class="icon-angle-right"></i> </span>&nbsp;<span id="showUsername"></span>&nbsp;</li><li><span class="divider"> <i class="icon-angle-right"></i> </span>&nbsp;我的群组</span>&nbsp;</li>
+        <li> <i class="icon-home"></i>  我的应用 &nbsp; </li><li><span class="divider"> <i class="icon-angle-right"></i> </span>&nbsp;<a href="javascript:toApppofile()"><span id="showName"></span></a>&nbsp;</li><li><span class="divider"> <i class="icon-angle-right"></i> </span>&nbsp;群组</span>&nbsp;</li><li><span class="divider"> <i class="icon-angle-right"></i> </span><span id="groupName"></span>&nbsp;&nbsp;</li><li><span class="divider"> <i class="icon-angle-right"></i> </span>&nbsp;成员列表</span>&nbsp;</li>
       </ul>
     </div>
     <div class="clearfix" id="page-content">
