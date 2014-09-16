@@ -135,8 +135,12 @@
 			searchUser(appUuid,username);
 		}
 	}
+	// 注册测试用户
+	function addNewAppUsers(){
+		window.location.href = 'app_users_create.html?appUuid='+appUuid;
+	}
 
-	//删除选定的用户
+	// 删除选定的用户
 	function deleteAppUsersBox(){
 		deleteAppUserCheckBox(appUuid);
 	}
@@ -307,6 +311,9 @@
 	</div>
 
 	<div class="pagination pagination-left">
+		<ul>
+	        <li> <a href="javascript:addNewAppUsers()">注册IM用户</a> </li>
+	      	</ul>&nbsp;&nbsp;&nbsp;&nbsp;
 		<ul>
 	        <li> <a href="javascript:deleteAppUsersBox()">批量删除</a> </li>
 	      	</ul>&nbsp;&nbsp;&nbsp;&nbsp;

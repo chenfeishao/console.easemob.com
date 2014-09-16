@@ -1609,7 +1609,93 @@ function saveNewAppAdmin(appUuid){
 	}
 }
 
+//=============================================================================================================================================
+
 //===================================================== User ==================================================================================
+// 创建IM用户
+// 用户名
+function onBlurCheckIMUsername(imUsername){
+	var imUsernameReg =  /^[0-9a-zA-Z]{1,18}$/;
+	if('' == imUsername) {
+		$('#imUsernameMsg').text('请输入用户名');
+		return false;
+	}
+	
+	if(!imUsernameReg.test(imUsername)){
+		$('#imUsernameMsg').text('1-18位长度字符(字母或数字)！');
+		return false;
+	}
+	
+	$('#imUsernameMsg').text('');
+	return true;
+}
+// 一次密码
+function onBlurCheckIMPassword(password){
+	var passwordReg =  /^[\s\S]{6,140}$/;
+	if('' == password) {
+		$('#passwordMsg').text('请输入密码');
+		return false;
+	}
+	if(!passwordReg.test(password)){
+		$('#passwordMsg').text('长度6位以上任意字符');
+		return false;
+	}
+	$('#passwordMsg').text('');
+	return true;
+}
+
+// 二次密码
+function onBlurCheckIMConfirmPassword(confirmPassword){
+	var password = $('#password').val();
+	if('' == confirmPassword) {
+		$('#confirmPasswordMsg').text('请再次输入密码！');
+		return false;
+	}
+	if(password != confirmPassword){
+		$('#confirmPasswordMsg').text('您两次输入的账号密码不一致!');
+		return false;
+	}
+	
+	$('#confirmPasswordMsg').text('');
+	return true;
+}
+
+// 提交表单
+function saveNewIMUser(appUuid){
+	var imUsername = $('#imUsername').val();
+	var password = $('#password').val();
+	var confirmPassword = $('#confirmPassword').val();
+	var email = $('#email').val();
+
+	var token = $.cookie('access_token');
+	var orgName = $.cookie('orgName');
+
+	var flag = onBlurCheckIMUsername(imUsername) && onBlurCheckIMConfirmPassword(confirmPassword) && onBlurCheckIMConfirmPassword(confirmPassword);
+	if(flag){
+		// Create a user
+		var d ={
+			username:imUsername,
+			password:password
+		};
+		$.ajax({
+			url:baseUrl + '/' + orgName + '/' + appUuid + '/users',
+			type:'POST',
+			data:JSON.stringify(d),
+			headers:{
+				'Authorization':'Bearer ' + token,
+				'Content-Type':'application/json'
+			},
+			success:function(respData){
+				alert('添加用户成功!');
+				window.location.href = 'app_users.html?appUuid='+appUuid;
+			},
+			error:function(data){
+				alert('提示!\n\n添加用户失败!');
+			}
+		});	
+	}
+}
+
 
 function selectAppUser(sel,appUuid,username){
 		var value = sel.value;
