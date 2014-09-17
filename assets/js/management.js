@@ -1615,14 +1615,14 @@ function saveNewAppAdmin(appUuid){
 // 创建IM用户
 // 用户名
 function onBlurCheckIMUsername(imUsername){
-	var imUsernameReg =  /^[0-9a-zA-Z]{1,18}$/;
+	var imUsernameReg =  /^[0-9a-zA-Z]{1,32}$/;
 	if('' == imUsername) {
 		$('#imUsernameMsg').text('请输入用户名');
 		return false;
 	}
 	
 	if(!imUsernameReg.test(imUsername)){
-		$('#imUsernameMsg').text('1-18位长度字符(字母或数字)！');
+		$('#imUsernameMsg').text('1-32位长度字符(字母或数字)！');
 		return false;
 	}
 	
