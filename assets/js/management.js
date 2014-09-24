@@ -3087,7 +3087,7 @@ function getAppCredentials(appUuid, pageAction){
 		if(typeof(pageAction)!='undefined' && pageAction != ''){	
 			temp = '&cursor='+cursors[pageNo];
 		}
-		var loading = '<tr id="tr_loading"><td class="text-center" colspan="5"><img src ="assets/img/loading.gif">&nbsp;&nbsp;&nbsp;<span>正在读取数据...</span></td></tr>';
+		var loading = '<tr id="tr_loading"><td class="text-center" colspan="6"><img src ="assets/img/loading.gif">&nbsp;&nbsp;&nbsp;<span>正在读取数据...</span></td></tr>';
 		$('#appCredentialBody').empty();
 		$('#appCredentialBody').append(loading);
 	$.ajax({
@@ -3101,7 +3101,7 @@ function getAppCredentials(appUuid, pageAction){
 				
 			},
 			success: function(respData, textStatus, jqXHR) {
-				$('#appCredentialBody').html('');
+				//$('#appCredentialBody').html('');
 				// 缓存游标,下次next时候存新的游标
 				if(pageAction!='forward'){
 					cursors[pageNo+1] =	respData.cursor;
@@ -3113,7 +3113,10 @@ function getAppCredentials(appUuid, pageAction){
 				}else{
 					var option = '';
 					$(respData.entities).each(function(){
+						var statusStr = '异常';
+
 						var name = this.name;
+						var credentialUuid = this.uuid;
 						var credentialId = this.uuid;
 						var passphrase = this.passphrase;
 						var environment = '';
@@ -3123,24 +3126,43 @@ function getAppCredentials(appUuid, pageAction){
 							environment = '生产';
 						}
 						
+						$.ajax({
+							async: false, 
+							url:baseUrl + '/' +orgName +'/'+appUuid+'/verify/' + credentialUuid,
+							type:'GET',
+							headers:{
+								'Authorization':'Bearer ' + access_token
+							},
+							error:function(){
+							},
+							success:function(respData){
+								var creStatus = respData.status;
+								if(creStatus == 'ok'){
+									statusStr = "正常";
+								}
+							}
+						});
+
 						var created = format(this.created);
 						var modified = format(this.modified);
 						option += '<tr>'+
-								'<td class="text-center">'+name+'</td>'+
-								'<td class="text-center">'+environment+'</td>'+
+							'<td class="text-center">'+name+'</td>'+
+							'<td class="text-center">'+environment+'</td>'+
 							'<td class="text-center">'+created+'</td>'+
 							'<td class="text-center">'+modified+'</td>'+
-							'<td class="text-center"><a href="javascript:deleteAppCredential(\''+ credentialId + '\',\''+ appUuid +'\')">删除</a></td>'+
+							'<td class="text-center" id="'+credentialUuid+'">'+statusStr+'</td>'+
+							'<td class="text-center"><a type="button" href="javascript:verifyCredential(\''+credentialUuid+'\',\''+appUuid+'\')">检测</a>&nbsp;|&nbsp;<a href="javascript:deleteAppCredential(\''+ credentialId + '\',\''+ appUuid +'\')">删除</a></td>'+
 							'</tr>';
 							
 					});
-					$('#tr_loading').remove();
+					//$('#tr_loading').remove();
+					$('#appCredentialBody').html('');
 					$('#appCredentialBody').append(option);
 				}
 				// 无数据
 				var tbody = document.getElementsByTagName("tbody")[0];
 				if(!tbody.hasChildNodes()){
-					var option = '<tr><td class="text-center" colspan="5">无数据!</td></tr>';
+					var option = '<tr><td class="text-center" colspan="6">无数据!</td></tr>';
 					$('#tr_loading').remove();
 					$('#appUserAdminBody').append(option);
 					var pageLi = $('#paginau').find('li');
@@ -3148,7 +3170,6 @@ function getAppCredentials(appUuid, pageAction){
 						$(pageLi[i]).hide();
 					}
 				} else {
-					// 20140810 liwei add
 					var ulB = '<ul>';
 					var ulE = '</ul>';
 					var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
@@ -3178,6 +3199,31 @@ function getAppCredentials(appUuid, pageAction){
 				}
 			}
 		});
+}
+
+// 证书验证
+function verifyCredential(credentialUuid,appUuid){
+        $('#'+credentialUuid).html('......');
+	var access_token = $.cookie('access_token');
+	var orgName = $.cookie('orgName');
+	$.ajax({
+		url:baseUrl + '/' +orgName +'/'+appUuid+'/verify/' + credentialUuid,
+		type:'GET',
+		headers:{
+			'Authorization':'Bearer ' + access_token
+		},
+		error:function(){
+			$('#'+credentialUuid).html('异常');
+		},
+		success:function(respData){
+			var creStatus = respData.status;
+			if(creStatus == 'ok'){
+				$('#'+credentialUuid).html('正常');
+			} else {
+				$('#'+credentialUuid).html('异常');
+			}
+		}
+	});
 }
 
 // 删除开发者推送证书
