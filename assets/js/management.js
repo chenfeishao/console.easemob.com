@@ -2197,6 +2197,49 @@ function sendMessgeOne(appUuid,users){
 }
 
 //发送消息
+function sendUserMessage1(){
+	var users = document.getElementById('usernameMessage').value;
+	var appUuid = document.getElementById('appUuidMessage').value;
+	var orgName = $.cookie('orgName');
+	var token = $.cookie('access_token');
+	var messageContent = $('#messegeContent').val().trim();
+	var target = users.split(',');
+	if ( messageContent ==''){
+		alert('消息不能为空');
+	}else{
+		var d = {
+		  "target_type" : "users",
+		  "target" : target,
+		  
+		  "msg" : {
+			  "type" : "txt",
+			  "msg" : messageContent //消息内容
+			  }
+		 }
+		 var layerNum = layer.load('正在发送...');
+		 $.ajax({
+				url:baseUrl+'/'+ orgName + "/" + appUuid + '/messages',
+				type:'POST',
+				headers:{
+					'Authorization':'Bearer '+token,
+					'Content-Type':'application/json'
+				},	
+				data:JSON.stringify(d),
+				error:function(respData){
+				layer.close(layerNum);
+					//alert('发送失败');
+				},
+				success:function(respData){
+					layer.close(layerNum);
+					$('#closeButn').click();
+					//alert('发送成功');
+				}
+		 });
+	}
+	
+}
+
+//发送消息
 function sendUserMessage(){
 	var users = document.getElementById('usernameMessage').value;
 	var appUuid = document.getElementById('appUuidMessage').value;
@@ -2208,12 +2251,12 @@ function sendUserMessage(){
 		alert('消息不能为空');
 	}else{
 		var d = {
-		  "target_type" : "users", //or chatgroups
-		  "target" : target, //注意这里需要用数组, 即使只有一个用户, 也要用数组 ['u1']
+		  "target_type" : "users",
+		  "target" : target,
 		  
 		  "msg" : {
 			  "type" : "txt",
-			  "msg" : messageContent //消息内容，参考[聊天记录](http://developer.easemob.com/docs/emchat/rest/chatmessage.html)里的bodies内容
+			  "msg" : messageContent //消息内容
 			  }
 		 }
 		 var layerNum = layer.load('正在发送...');
@@ -2247,7 +2290,7 @@ function sendUserImgMessage(){
 		var appUuid = document.getElementById('appUuidMessage').value;
 		var orgName = $.cookie('orgName');
 		var token = $.cookie('access_token');
-		var messageContent = $('#messegeContent').val();
+		//var messageContent = $('#messegeContent').val();
 		var target = users.split(',');
 		var str = $('#share-secret').val().split(',');
 		var d = {
@@ -2267,13 +2310,15 @@ function sendUserImgMessage(){
 				},	
 				data:JSON.stringify(d),
 				error:function(respData){
-				layer.close(layerNum);
-				alert('发送失败');
+					layer.close(layerNum);
+					alert('发送失败');
 				},
 				success:function(respData){
 					layer.close(layerNum);
 					$('#closeButn').click();
 					alert('发送成功');
+					// 清空图片元素
+					$('#img2').attr("src","assets/img/140144.jpg");
 				}
 		 });
 	}

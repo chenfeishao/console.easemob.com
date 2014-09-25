@@ -62,30 +62,11 @@
 				return false;
 		});
 
-		// 默认选中文字消息
-		$('#msgTypeVtext').checked = true;
-		$('#myForm').hide();
-
-		$("#msgTypeVtext").click(function(){
-			var checkedInput = $('#msgType').find('input:checked');
-			if(checkedInput.val() == "ttext") {
-				$('#msgTypeVtext').checked = true;
-				$('#msgTypeVimg').checked = false;
-				$('#myForm').hide();
-			}
-		});
-		$("#msgTypeVtimg").click(function(){
-			var checkedInput = $('#msgType').find('input:checked');
-			if(checkedInput.val() == "timg"){
-				$('#msgTypeVimg').checked = true;
-				$('#msgTypeVtext').checked = false;
-				$('#myForm').show();
-	   		}
-		});
-		
 	});
 
+	// 图片上传
 	function imgMessage(){
+		$('#img2').attr("src","assets/img/loading.gif");
 		var img = $('#file').val().substr( $('#file').val().lastIndexOf('.')+1);
 		img = img.toLowerCase();
 		if(img == 'jpg'|| img == 'png'|| img == 'bmp'|| img =='gif' || img == 'jpeg' ){
@@ -100,8 +81,10 @@
 			    'Authorization':'Bearer ' + access_token,
 		 	},
 			 success:function(respData){
-			 	document.getElementById('messegeContent').style.display="none";
-			 	$('#div1').append('<img id="img1" src="'+baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid+'" />');
+			 	//document.getElementById('messegeContent').style.display="none";
+var srcV = baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid;
+$('#img2').attr("src",srcV);
+			 	//$('#div2').append('<img id="img1" height="63" width="63" src="'+baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid+'" />');
 			 	var str = $('#file').val()+","+respData.entities[0]['share-secret'];
 			 	$('#share-secret').val(str);
 				$('#imgUuid').val(baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid);
@@ -197,10 +180,18 @@
 
 	//发送消息判断
 	function sendMessage(){
-		var img = document.getElementById('img1');
-		if(img == null ){
+		//var img = document.getElementById('img1');
+//		var img = document.getElementById('img2');
+		
+		var img2src = $('#img2').attr("src");
+		var messegeContent = $('#messegeContent').val();
+		if(img2src == 'assets/img/140144.jpg' && messegeContent == ''){
+		} else if(img2src != 'assets/img/140144.jpg' && messegeContent == ''){	
+			sendUserImgMessage();
+		} else if(img2src == 'assets/img/140144.jpg' && messegeContent != ''){	
 			sendUserMessage();
-		}else{	
+		} else if(img2src != 'assets/img/140144.jpg' && messegeContent != ''){	
+			sendUserMessage1();
 			sendUserImgMessage();
 		}
 	}
@@ -359,10 +350,6 @@
             <tbody id="appUserBody"></tbody>
           </table>
           <div id="paginau" class="pagination pagination-right">
-          	<!--<ul>
-              <li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>
-              <li> <a href="javascript:void(0);" onclick="getNextAppUserList();">下一页</a> </li>
-            </ul>-->
             <span id="pageInfo"></span>
           </div>
         </div>
@@ -417,27 +404,26 @@
 				<input type="hidden" id="imgUuid" />
 			</div>
 			<div class="modal-header">
-				<h3 id="msgType"><font style="font-size:13px">消息类型：</font>
-				<input style="opacity:1;" type="radio" name="msgTypeV" id="msgTypeVtext" value="ttext" checked="checked" /><font style="font-size:13px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;文字</font>
-				<input style="opacity:1;" type="radio" name="msgTypeV" id="msgTypeVtimg" value="timg" /><font style="font-size:13px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 图片</font></h3>
+				<h3 id="msgType"><font style="font-size:13px;color:red">提醒：</font>
+				<font style="font-size:13px;color:red">&nbsp;可以文字和图片同时发送,也可任选其一发送</font>
 			</div>
 			<div class="modal-body">
 				<div class="row-fluid">
 					<div class="span12">
 						<form id="myForm" method="POST" enctype="multipart/form-data" action=""> 
 							<div class="control-group">
-								<label class="control-label" for="f_file">路径：</label>
+							<label class="control-label" for="f_file">选择图片：</label>
 								<div class="controls" id="div2">
-		                 				<input type="text" readonly="readonly" id="f_file"/>
-						      	      	<input type="button" value="浏览..." class="btn btn-mini btn-primary" onClick="file.click()" />
-		                            			<input type="button" value="确定" class="btn btn-mini btn-primary" onClick="imgMessage()" />
-								<input type="file" name="file" id="file" onChange="f_file.value=this.value;validateSuffix(this.value)" style="display:none">
-		                                            	<input type="hidden" id="share-secret" />
+				         				<input type="text" readonly="readonly" id="f_file" />
+							      	      	<input type="button" value="浏览..." class="btn btn-mini btn-primary" onClick="file.click()"/>
+									<input type="file" name="file" id="file" onChange="f_file.value=this.value;imgMessage();" style="display:none">
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img id="img2" height="91" width="91" src="assets/img/140144.jpg" />
+				                                    	<input type="hidden" id="share-secret" />
 								</div>
 							</div>
                          			</form>
 						<div class="control-group">
-							<label class="control-label" for="messegeContent">消息内容：</label>
+							<label class="control-label" for="messegeContent">输入文字：</label>
 							<div class="controls" id="div1">
                             					<textarea style="width:500px; height:100px;" id="messegeContent" name="messegeContent" ></textarea>
 								<input type="hidden" id="usernameMessage" name="usernameMessage" value=""/>
