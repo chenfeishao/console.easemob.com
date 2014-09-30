@@ -66,7 +66,7 @@
 
 	// 图片上传
 	function imgMessage(){
-		$('#img2').attr("src","assets/img/loading.gif");
+		$('#uploadresspan').text('图片上传中...');
 		var img = $('#file').val().substr( $('#file').val().lastIndexOf('.')+1);
 		img = img.toLowerCase();
 		if(img == 'jpg'|| img == 'png'|| img == 'bmp'|| img =='gif' || img == 'jpeg' ){
@@ -81,10 +81,9 @@
 			    'Authorization':'Bearer ' + access_token,
 		 	},
 			 success:function(respData){
-			 	//document.getElementById('messegeContent').style.display="none";
-var srcV = baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid;
-$('#img2').attr("src",srcV);
-			 	//$('#div2').append('<img id="img1" height="63" width="63" src="'+baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid+'" />');
+//var srcV = baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid;
+//$('#img2').attr("src",srcV);
+$('#uploadresspan').text('图片上传成功 !');
 			 	var str = $('#file').val()+","+respData.entities[0]['share-secret'];
 			 	$('#share-secret').val(str);
 				$('#imgUuid').val(baseUrl + '/' + orgName + '/' + appUuid + '/chatfiles/'+respData.entities[0].uuid);
@@ -180,17 +179,14 @@ $('#img2').attr("src",srcV);
 
 	//发送消息判断
 	function sendMessage(){
-		//var img = document.getElementById('img1');
-//		var img = document.getElementById('img2');
-		
-		var img2src = $('#img2').attr("src");
+		var uploadresspan = $('#uploadresspan').text();
 		var messegeContent = $('#messegeContent').val();
-		if(img2src == 'assets/img/140144.jpg' && messegeContent == ''){
-		} else if(img2src != 'assets/img/140144.jpg' && messegeContent == ''){	
+		if(uploadresspan == '等待上传图片' && messegeContent == ''){
+		} else if(uploadresspan != '等待上传图片' && messegeContent == ''){	
 			sendUserImgMessage();
-		} else if(img2src == 'assets/img/140144.jpg' && messegeContent != ''){	
+		} else if(uploadresspan == '等待上传图片' && messegeContent != ''){	
 			sendUserMessage();
-		} else if(img2src != 'assets/img/140144.jpg' && messegeContent != ''){	
+		} else if(uploadresspan != '等待上传图片' && messegeContent != ''){	
 			sendUserMessage1();
 			sendUserImgMessage();
 		}
@@ -222,6 +218,10 @@ $('#img2').attr("src",srcV);
 				checkbox[i].checked = false;	
 			}	
 		}
+	}
+
+	function clsupSpan(){
+	    	$('#uploadresspan').text('等待上传图片');
 	}
 	
 </script>
@@ -415,9 +415,10 @@ $('#img2').attr("src",srcV);
 							<label class="control-label" for="f_file">选择图片：</label>
 								<div class="controls" id="div2">
 				         				<input type="text" readonly="readonly" id="f_file" />
-							      	      	<input type="button" value="浏览..." class="btn btn-mini btn-primary" onClick="file.click()"/>
+							      	      	<input type="button" value="选择..." class="btn btn-mini btn-primary" onClick="file.click()"/>
 									<input type="file" name="file" id="file" onChange="f_file.value=this.value;imgMessage();" style="display:none">
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img id="img2" height="91" width="91" src="assets/img/140144.jpg" />
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span id="uploadresspan">等待上传图片</span>
 				                                    	<input type="hidden" id="share-secret" />
 								</div>
 							</div>
@@ -436,7 +437,7 @@ $('#img2').attr("src",srcV);
 			
 			<div class="modal-footer"> 
 				<a class="btn" onClick="sendMessage();" href="javascript:void(0);">发送</a>
-				<button id="messageCloseBtn" class="btn" data-dismiss="modal" onClick="clsSpan()" aria-hidden="true">关闭</button>
+				<button id="messageCloseBtn" class="btn" data-dismiss="modal" onClick="clsupSpan()" aria-hidden="true">关闭</button>
 			</div>
 		</div>
         <!--发送消息end-->

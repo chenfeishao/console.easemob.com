@@ -2318,6 +2318,7 @@ function sendUserImgMessage(){
 					$('#closeButn').click();
 					alert('发送成功');
 					// 清空图片元素
+$('#uploadresspan').text('等待上传图片');
 					$('#img2').attr("src","assets/img/140144.jpg");
 				}
 		 });
