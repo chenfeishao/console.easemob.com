@@ -146,11 +146,13 @@
 	//添加群组
 	var publics = true;
 	var approval=true;
-    	function addqunFriendusers(){
+    	function createNewChatgroupPre(){
 	   var qunzuname=$("#qunzuname").val();
 	   var qunzumiaosu=$("#qunzumiaosu").val();
 	   var qunzuguan=$("#qunzuguan").val();
-	  addqunzuFriendusers(appUuid,qunzuname,qunzumiaosu,approval,publics,qunzuguan);
+	   var maxusers=$("#maxusers").val();
+	  createNewChatgroups(appUuid,qunzuname,qunzumiaosu,approval,publics,qunzuguan);
+	   
 	}
 	//判断是否是公开群
 	function nums(){
@@ -394,10 +396,21 @@
 				<div class="row-fluid">
 					<div class="span12">
 						<div class="control-group">
-							<label class="control-label" for="pwdMondifytwo">群主：</label>
+							<label class="control-label" for="maxusers">最大成员数：</label>
+							<div class="controls">
+								<input type="text" id="maxusers" name="maxusers" value="" placeholder="请输入最大成员数" />
+								<span style="color: red;" id="pmaxuserSpan"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span12">
+						<div class="control-group">
+							<label class="control-label" for="qunzuguan">群主：</label>
 							<div class="controls">
 								<input type="text" id="qunzuguan" name="qunzuguan" value="" placeholder="请输入群主账号" />
-								<span style="color: red;" id="pwdMondifytwoSpan"></span>
+								<span style="color: red;" id="qunzuguanSpan"></span>
 							</div>
 						</div>
 					</div>
@@ -405,7 +418,7 @@
 			</div>
 			
 			<div class="modal-footer"> 
-				<a class="btn" onClick="addqunFriendusers();"">添加</a>
+				<a class="btn" onClick="createNewChatgroupPre();"">添加</a>
 				<button class="btn" data-dismiss="modal" onClick="clsSpan()" aria-hidden="true">关闭</button>
 			</div>
 		</div>

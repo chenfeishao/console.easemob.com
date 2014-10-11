@@ -2974,30 +2974,38 @@ function addIMFriendusers(){
 	
 }
 //添加群组
-function addqunzuFriendusers(appUuid,qunzuname,qunzumiaosu,approval,publics,qunzuguan){
+function createNewChatgroups(appUuid,qunzuname,qunzumiaosu,approval,publics,qunzuguan){
 	var orgName = $.cookie('orgName');
 	var access_token = $.cookie('access_token');
 	var owner_username = $('#usernameFriend').val();
-	//var appUuid = $('#appUuidFriend').val();
+	var maxusers = $('#maxusers').val();
 	var friend_username = $('#friendUsername').val();
-	var qun={
-	    "groupname":qunzuname,
-	    "desc":qunzumiaosu, 
-	    "public":publics, 
-	   // "approval":approval, 
-	    "owner":qunzuguan
-	}; 
 
-	if(publics==true){
-	    qun.approval=approval;
-	}
 	if (qunzuname == ''){
 	    alert('群组名称不能为空!');	
 	}else if(qunzumiaosu==''){
 	    alert('群组描述不能为空');
+        }
+	var maxusersReg = /^[0-9]+$/;           
+	if (maxusers == ''){
+	   	$('#pmaxuserSpan').text('请输入群组最大成员数!');
+	} else if(!(maxusersReg.test(maxusers) && parseInt(maxusers)>1 && parseInt(maxusers)<=2000)){
+		$('#pmaxuserSpan').text('群组最大成员数只能是1-2000之内的数值!');
 	}else if(qunzuguan==''){
-	    alert('群组管理员不能为空');
+	    	$('#qunzuguanSpan').text('群组管理员不能为空');
 	}else{
+		$('#pmaxuserSpan').text('');
+		$('#qunzuguanSpan').text('');
+		var qun={
+	    		"groupname":qunzuname,
+	    		"desc":qunzumiaosu, 
+	    		"public":publics, 
+	    		"owner":qunzuguan,
+	    		"maxusers":parseInt(maxusers)
+		}; 
+		if(publics==true){
+	    		qun.approval=approval;
+		}
 		$.ajax({
 				url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups',
 				type:'POST',
