@@ -2483,12 +2483,12 @@ function sendUserMessages(){
 				data:JSON.stringify(d),
 				error:function(respData){
 				layer.close(layerNum);
-				alert('发送失败');
+					//alert('发送失败');
 				},
 				success:function(respData){
 					layer.close(layerNum);
 					$('#closeButn').click();
-					alert('发送成功');
+					//alert('发送成功');
 				}
 		 });
 	}
