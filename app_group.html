@@ -132,14 +132,16 @@
 	function sendMessage(){
 		var uploadresspan = $('#uploadresspan').text();
 		var messegeContent = $('#messegeContent').val();
+alert(uploadresspan);
+alert(messegeContent)
 		if(uploadresspan == '等待上传图片' && messegeContent == ''){
 		} else if(uploadresspan != '等待上传图片' && messegeContent == ''){	
-			sendUserImgMessage();
+			sendUserImgMessages();
 		} else if(uploadresspan == '等待上传图片' && messegeContent != ''){	
-			sendUserMessage();
+			sendUserMessages();
 		} else if(uploadresspan != '等待上传图片' && messegeContent != ''){	
-			sendUserMessage1();
-			sendUserImgMessage();
+			sendUserMessages();
+			sendUserImgMessages();
 		}
 
 	}
