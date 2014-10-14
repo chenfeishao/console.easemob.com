@@ -59,23 +59,15 @@
 				searchUserTmp();
 				return false;
 		});
-	});	
-	// 上一页数据
-	function getPrevAppUserList(){
-		getAppUserList(appUuid,'forward');
-	}
-	// 下一页数据
-	function getNextAppUserList(){
-		getAppUserList(appUuid,'next');
-	}
+	});
 	
 	// 搜索用户
 	function searchUserTmp(){
-		var username = $('#userInbox').val();
-		if(username == '' || username == null){
-			alert('请输入要查找的用户名');
+		var qunzuidV = $('#qunzuid').val();
+		if(qunzuidV == '' || qunzuidV == null){
+			alert('请输入要查找的群组ID');
 		} else {
-			searchUser(appUuid,username);
+			getqunzuAppChatrooms(appUuid,qunzuidV);
 		}
 	}
 	//删除选定的用户
@@ -172,7 +164,7 @@
 	}
 	//搜索群组
 	function shousuoqunzu(){
-	var groupid=$("#qunzuid").val();
+		var groupid=$("#qunzuid").val();
       		getqunzuAppChatrooms(appUuid,groupid);
 	}
 	

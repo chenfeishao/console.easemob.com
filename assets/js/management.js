@@ -311,7 +311,8 @@ function regsFormValidate(){
 		$('#regRePasswordEMsg').text('两次密码不一致!');
 		return false;
 	}
-	var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+	//var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+	var emailReg = /^([a-zA-Z0-9]+[_|\_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
 	if('' == regEmail){
 		$('#regEmailEMsg').text('请输入邮箱！');
 		return false;
@@ -2163,21 +2164,21 @@ function sendMessge(appUuid){
 		}
 	}
 	if(num>0){
-	var users = new Array();
+		var users = new Array();
 		for (var i=0;i<checkbox.length;i++){
 			if(checkbox[i].checked){
 				users.push(checkbox[i].value);
 			}
 		}
-	$('#usernameMessage').val(users);
-	$('#appUuidMessage').val(appUuid);
-	$('#messegeContent').val('');
-	document.getElementById('messegeContent').style.display="block";
-	$('#img1').remove();
-	$('#share-secret').val('');
-	$('#file').val('');
-	$('#f_file').val('');
-	$('#sendMessageA').click();
+		$('#usernameMessage').val(users);
+		$('#appUuidMessage').val(appUuid);
+		$('#messegeContent').val('');
+		document.getElementById('messegeContent').style.display="block";
+		$('#img1').remove();
+		$('#share-secret').val('');
+		$('#file').val('');
+		$('#f_file').val('');
+		$('#sendMessageA').click();
 	}else{
 		alert('至少选择一个用户!');	
 	}
@@ -2680,7 +2681,7 @@ function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
 		if(typeof(pageAction)!='undefined' && pageAction != ''){	
 			tmp = '&cursor=' + cursors[pageNo];
 		}
-		var loading = '<tr id="tr_loading"><td class="text-center" colspan="3"><img src ="assets/img/loading.gif">&nbsp;&nbsp;&nbsp;<span>正在读取数据...</span></td></tr>';
+		var loading = '<tr id="tr_loading"><td class="text-center" colspan="4"><img src ="assets/img/loading.gif">&nbsp;&nbsp;&nbsp;<span>正在读取数据...</span></td></tr>';
 		$('#appChatroomBody').empty();
 		$('#appChatroomBody').append(loading);
 		$.ajax({
