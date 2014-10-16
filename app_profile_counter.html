@@ -167,20 +167,6 @@
 		var dt1 = Date.parse(endTime.replace(/-/g,"/"));//结束时间
 		var theTime =new Date(dt1);
 		var nowtime1 = theTime.getTime();
-		/*
-		var now_str = startTime.replace(/:/g, '-'); 
-			now_str = now_str.replace(/ /g, '-');
-		var arrs = now_str.split("-");//分割成数组
-		var datums  = new Date(Date.UTC(arrs[0], arrs[1] - 1, arrs[2], arrs[3], arrs[4]));
-		var nowtime = datums.getTime();
-		
-		var now_str1 = endTime.replace(/:/g, '-'); 
-			now_str1 = now_str1.replace(/ /g, '-');
-		var arrs1  = now_str1.split("-");//分割成数组
-		var datums1  = new Date(Date.UTC(arrs1[0], arrs1[1] - 1, arrs1[2], arrs1[3], arrs1[4]));
-		var nowtime1 = datums1.getTime();
-		alert(nowtime+"烦烦烦"+startTime);
-		*/
 		applyRequest.start_time=nowtime;
 		applyRequest.end_time=nowtime1;
 		
@@ -307,35 +293,15 @@
 			    alert("请重新选择结束日期，结束日期不能大于本日日期");
 				return;
 			  }else{
-			if($(':radio:checked').val()=="GET请求次数"){
-			   url='application.requests.get';
-			   danwei='次';
-			   yName="GET请求数量";
+			if($(':radio:checked').val()=="IM用户数量变化"){
+		           url='application.collection.users';
+			   danwei='个(正数表示新增，负数表示删除)';
+			   yName="IM用户数量";
 			};
-			if($(':radio:checked').val()=="POST请求次数"){
-		       url='application.requests.post';
-			   danwei='次';
-			   yName="POST请求数量";
-			};
-			if($(':radio:checked').val()=="DELETE请求次数"){
-		       url='application.requests.delete';
-			   danwei='次';
-			   yName="DELETE请求数量";
-			};
-			if($(':radio:checked').val()=="PUT请求次数"){
-		       url='application.requests.put';
-			   danwei='次';
-			   yName="PUT请求数量";
-			};
-			if($(':radio:checked').val()=="IM用户"){
-		       url='application.collection.users';
-			   danwei='个';
-			   yName="用户数量变化";
-			};
-			if($(':radio:checked').val()=="消息"){
+			if($(':radio:checked').val()=="消息流通数量变化"){
 		       url='application.collection.chatmessages';
 			   danwei='条';
-			   yName="消息发送数量";
+			   yName="消息流通数量";
 			};
                };
 			applyChatMessagesData(applyRequest,flow,labels,url);/* labelDisplay="ROTATE" slentlabels="1" 跳跃模式labelStep='4' */
@@ -387,22 +353,22 @@
 					var leave2=leave1%(3600*1000);        //计算小时数后剩余的毫秒数
 					var minutes=Math.floor(leave2/(60*1000));
 					 if(days>30){//超过一月按月算
-                         company="月";
-					     applyRequest.resolution='month';
+                         			company="月";
+					     	applyRequest.resolution='month';
 					 }else{//否则按天算
-                         company="天";
-					     applyRequest.resolution='day';
+                         			company="天";
+					     	applyRequest.resolution='day';
 					 }
 					 if(days==0){//没有超过一月就对比天数
 						 if(hours>24){//超过一天按天算
-                           company="天";
-					       applyRequest.resolution='day';
+                           				company="天";
+					       		applyRequest.resolution='day';
 						 }else{//没有超过一天就按小时算
-                           company="小时";
-					       applyRequest.resolution='hour';
+                           				company="小时";
+					       		applyRequest.resolution='hour';
 						 }
 					 }
-					 if(days==0 && hours==0){//没有超过一个月，又没有超过一天
+			if(days==0 && hours==0){//没有超过一个月，又没有超过一天
                           if(minutes<30){//没有超过半小时按分钟计
 						     company="五分钟";
 					         applyRequest.resolution='five_minutes';
@@ -412,35 +378,15 @@
 						  }
 					 }
 
-			if($(':radio:checked').val()=="GET请求次数"){
-			   url='application.requests.get';
-			   danwei='次';
-			   yName="GET请求数量";
+			if($(':radio:checked').val()=="IM用户数量变化"){
+		       	   url='application.collection.users';
+			   danwei='个(正数表示新增，负数表示删除)';
+			   yName="IM用户数量";
 			};
-			if($(':radio:checked').val()=="POST请求次数"){
-		       url='application.requests.post';
-			   danwei='次';
-			   yName="POST请求数量";
-			};
-			if($(':radio:checked').val()=="DELETE请求次数"){
-		       url='application.requests.delete';
-			   danwei='次';
-			   yName="DELETE请求数量";
-			};
-			if($(':radio:checked').val()=="PUT请求次数"){
-		       url='application.requests.put';
-			   danwei='次';
-			   yName="PUT请求数量";
-			};
-			if($(':radio:checked').val()=="新增用户"){
-		       url='application.collection.users';
-			   danwei='个';
-			   yName="用户数量变化";
-			};
-			if($(':radio:checked').val()=="消息"){
-		       url='application.collection.chatmessages';
+			if($(':radio:checked').val()=="消息流通数量变化"){
+		       	   url='application.collection.chatmessages';
 			   danwei='条';
-			   yName="消息发送数量";
+			   yName="消息流通数量";
 			};
                };
 			applyChatMessagesData(applyRequest,flow,labels,url);
@@ -574,13 +520,9 @@
 
     		<div style="width:1000px; margin:0 auto; overflow:visible;">
     			<div style="float:right;">
-							<input type="hidden" id="dtp_input2" value="" /><br/>
-		    		<input type="radio" name="divRadio" id="userDiv" value="IM用户" onclick="getDiv()"/><span class="lbl">IM用户</span>
-		    		<input type="radio" name="divRadio" id="msgDiv" value="消息" onclick="getDiv()" /><span class="lbl">消息</span>
-					<input type="radio" name="divRadio" id="getDiv" value="GET请求次数" onclick="getDiv()" /><span class="lbl">GET请求次数</span>
-					<input type="radio" name="divRadio" id="postDiv" value="POST请求次数" onclick="getDiv()" /><span class="lbl">POST请求次数</span>
-					<input type="radio" name="divRadio" id="deleteDiv" value="DELETE请求次数" onclick="getDiv()" /><span class="lbl">DELETE请求次数</span>
-					<input type="radio" name="divRadio" id="putDiv" value="PUT请求次数" onclick="getDiv()" /><span class="lbl">PUT请求次数</span>
+				<input type="hidden" id="dtp_input2" value="" /><br/>
+		    		<input type="radio" name="divRadio" id="userDiv" value="IM用户数量变化" onclick="getDiv()"/><span class="lbl">IM用户数量变化</span>
+		    		<input type="radio" name="divRadio" id="msgDiv" value="消息流通数量变化" onclick="getDiv()" /><span class="lbl">消息流通数量变化</span>
 		    	</div>
 				<div style="position:absolute;right:180px;top:185px;z-index:100;">
                     <input type="hidden" id="dtp_input2" value="" /><br/><span class="lbl">快速查询：</span>
