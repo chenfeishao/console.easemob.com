@@ -133,7 +133,7 @@ function resetPasswdFormValidate(){
 		$('#email').focus();
 		return false;
 	}
-  var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+        var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
 	if(!emailReg.test(email)){
 		$('#emailEMsg').text('请输入有效的邮箱！');
  		$('#email').focus();
@@ -156,7 +156,6 @@ function resetPasswd(){
 			data:{},
 			crossDomain:true,
 			success:function(respData){
-				// 告知发送邮件
 				if(respData.status && respData.status == 'ok') {
 					alert('提示!\n\n邮件已发送,请前往邮箱继续找回密码.');
 				}
@@ -251,20 +250,17 @@ function regsFormValidate(){
 	if('' == regOrgName){
 		$('#regOrgNameSMsg').css('display','none');
 		$('#regOrgNameEMsg').text('企业ID名不能为空！');
-		//$('#regOrgName').focus();
 		return false;
 	}
 	var regOrgNameRegex = /^(?!-)(?!.*?-$)[a-zA-Z0-9-]+$/;
 	if(!regOrgNameRegex.test(regOrgName)){
 		$('#regOrgNameSMsg').css('display','none');
 	 	$('#regOrgNameEMsg').text('只能使用数字,字母,横线,且不能以横线开头和结尾！');
- 		//$('#regOrgName').focus();
 		return false;
  	}
  	if(regOrgName != '' && regOrgName.length < 3 || regOrgName.length > 18){
 		$('#regOrgNameSMsg').css('display','none');
 		$('#regOrgNameEMsg').text('企业ID长度在3-18个字符之间！');	
-		//$('#regOrgName').focus();
 		return false;
 	}
 	$('#regOrgNameSMsg').css('display','block');
@@ -272,46 +268,37 @@ function regsFormValidate(){
 	if('' == regUserName){
 		$('#regUserNameSMsg').css('display','none');
 		$('#regUserNameEMsg').text('用户名不能为空！');
-		//$('#regUserName').focus();
 		return false;
 	}
 	var regUserNameRegex = /^[0-9a-zA-Z]*$/;
 	if(!regUserNameRegex.test(regUserName)){
 		$('#regUserNameEMsg').text('用户名只能是字母,数字或字母数字组合！');
- 		//$('#regUserName').focus();
 		return false;
  	}
  	if(regUserName != '' && regUserName.length < 1 || regUserName.length > 18){
 		$('#regUserNameSMsg').css('display','none');
 		$('#regUserNameEMsg').text('用户长度在1-18个字符之间！');	
-		//$('#regUserName').focus();
 		return false;
 	}
 	$('#regUserNameSMsg').css('display','block');
 	if('' == regPassword){
 		$('#regPasswordSMsg').css('display','none');
 		$('#regPasswordEMsg').text('密码不能为空！');
-		//$('#regPassword').focus();
 		return false;
 	}
 	if(regPassword.length < 6 || regPassword.length > 20){
-		//$('#regPassword').focus();
 		$('#regPasswordEMsg').text('密码长度在6-20个字符之间！');
 		return false;
 	}
 	$('#regPasswordSMsg').css('display','block');
 	if('' == regRePassword){
-		//$('#regRePassword').focus();
 		$('#regRePasswordEMsg').text('请再次输入密码！');
 		return false;
 	}
 	if('' != regRePassword && regPassword != regRePassword){
-		//$('#regPassword').focus();
-		//$('#regRePassword').focus();
 		$('#regRePasswordEMsg').text('两次密码不一致!');
 		return false;
 	}
-	//var emailReg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
 	var emailReg = /^([a-zA-Z0-9]+[_|\_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
 	if('' == regEmail){
 		$('#regEmailEMsg').text('请输入邮箱！');
@@ -325,7 +312,6 @@ function regsFormValidate(){
 	if(regTel != '' && !regTelReg.test(regTel)){
 		$('#regTelSEMsg').css('display','none');
 		$('#regTelEMsg').text('联系电话号码格式不符合要求！');
-		//$('#regEmail').focus();
 		return false;
 	}
 		
@@ -397,7 +383,6 @@ function formSubmit(){
 				$('#login-box').addClass('visible');
 				$('#username').val(regUserName);
 			
-				// 告知发送邮件
 				window.location.href = 'regist_org_success.html?mailSuffix='+mailSuffix+'&regEmail='+regEmail;
 			},
 			error: function(respData, textStatus, jqXHR) {
@@ -1026,7 +1011,6 @@ function updateUsersPageStatus(){
 				total = respData.count;
 				var totalPage = (total % 10 == 0) ? (parseInt(total / 10)) : (parseInt(total / 10) + 1);
 				
-				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
 				var ulB = '<ul>';
 				var ulE = '</ul>';
 				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
@@ -1035,23 +1019,15 @@ function updateUsersPageStatus(){
 				// 首页
 				if(pageNo == 1){
 					if(totalPage == 1){
-						//$(pageLi[0]).hide();
-						//$(pageLi[1]).hide();
 						$('#paginau').append(ulB + ulE);
 					} else {
 						$('#paginau').append(ulB + textOp2 + ulE);
-						//$(pageLi[0]).hide();
-						//$(pageLi[1]).show();
 					}
 					// 尾页
 				} else if(totalPage ==  pageNo){
 					$('#paginau').append(ulB + textOp1 + ulE);
-					//$(pageLi[0]).show();
-					//$(pageLi[1]).hide();
 				} else {
 					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
-					//$(pageLi[0]).show();
-					//$(pageLi[1]).show();
 				}
 			}
 		});
@@ -1083,7 +1059,6 @@ function updateUsersAdminPageStatus(){
 				total = respData.entities.length;
 				var totalPage = (total % 10 == 0) ? (parseInt(total / 10)) : (parseInt(total / 10) + 1);
 				
-				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
 				var ulB = '<ul>';
 				var ulE = '</ul>';
 				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
@@ -1092,23 +1067,14 @@ function updateUsersAdminPageStatus(){
 				// 首页
 				if(pageNo == 1){
 					if(totalPage == 1){
-						//$(pageLi[0]).hide();
-						//$(pageLi[1]).hide();
 						$('#paginau').append(ulB + ulE);
 					} else {
 						$('#paginau').append(ulB + textOp2 + ulE);
-						//$(pageLi[0]).hide();
-						//$(pageLi[1]).show();
 					}
-					// 尾页
 				} else if(totalPage ==  pageNo){
 					$('#paginau').append(ulB + textOp1 + ulE);
-					//$(pageLi[0]).show();
-					//$(pageLi[1]).hide();
 				} else {
 					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
-					//$(pageLi[0]).show();
-					//$(pageLi[1]).show();
 				}
 			}
 		});
@@ -1138,8 +1104,6 @@ function updateIMPageStatus(owner_username){
 			success: function(respData, textStatus, jqXHR) {
 				total = respData.entities.length;
 				var totalPage = (total % 10 == 0) ? (parseInt(total / 10)) : (parseInt(total / 10) + 1);
-				
-				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
 				var ulB = '<ul>';
 				var ulE = '</ul>';
 				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
@@ -1148,23 +1112,15 @@ function updateIMPageStatus(owner_username){
 				// 首页
 				if(pageNo == 1){
 					if(totalPage == 1){
-						//$(pageLi[0]).hide();
-						//$(pageLi[1]).hide();
 						$('#paginau').append(ulB + ulE);
 					} else {
 						$('#paginau').append(ulB + textOp2 + ulE);
-						//$(pageLi[0]).hide();
-						//$(pageLi[1]).show();
 					}
 					// 尾页
 				} else if(totalPage ==  pageNo){
 					$('#paginau').append(ulB + textOp1 + ulE);
-					//$(pageLi[0]).show();
-					//$(pageLi[1]).hide();
 				} else {
 					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
-					//$(pageLi[0]).show();
-					//$(pageLi[1]).show();
 				}
 			}
 		});
@@ -1204,7 +1160,6 @@ function getAppList(){
 					uuidArr.push(value);
 					key = key.substring(key.indexOf('/')+1);
 					userCount = 0;
-					// 获取每个app的用户数
 					$.ajax({
 						url:baseUrl+'/'+ orgName +'/' + value + '/counters?counter=application.collection.users&pad=true',
 						type:'GET',
@@ -1235,9 +1190,6 @@ function getAppList(){
 					
 					option += '<tr><td class="text-center"><a href="app_profile.html?appUuid='+value+'&Application='+key+'">'+key+'</a></td>'+
 						 	'<td class="text-center">'+userCount+'</td>'+
-					   	//'<td class="text-center">800/500</td>'+
-						 	//'<td class="text-center">800/500</td>'+
-						 	//'<td class="text-center">800/500</td>'+
 						 	'<td class="text-center">上线运行中</td>'+
 				 		'</tr>';
 					
@@ -1318,7 +1270,6 @@ function getAppProfile(appUuid){
 					}
 					$('#appKey').text(organizationName+'#'+applicationName);
 					$('#xmlandroidAppkey').text(organizationName+'#'+applicationName);
-					//$('#xmliosAppkey').text(organizationName+'#'+applicationName);
 					$('#created').text(created);
 					$('#modified').text(modified);
 					$('#allowOpen').text(allowOpen);
@@ -1330,9 +1281,6 @@ function getAppProfile(appUuid){
 				$('#showName').text(respData.applicationName);
 			}
 		});
-		
-		// 获取app credential
-		//http://a1.easemob.com:80/management/organizations/belo/applications/myapptest/credentials
 		
 		$.ajax({
 			url: baseUrl + '/' + orgName + '/' + appUuid + '/credentials',
@@ -1552,7 +1500,6 @@ function saveNewAppAdmin(appUuid){
 	var token = $.cookie('access_token');
 	var orgName = $.cookie('orgName');
 
-	//var flag = onBlurCheckUsername(appAdminUsername) && onBlurCheckPassword(password) && onBlurCheckConfirmPassword(confirmPassword) &&onBlurCheckEmail(email);
 	var flag = onBlurCheckUsername(appAdminUsername) && onBlurCheckConfirmPassword(confirmPassword) &&onBlurCheckEmail(email);
 	if(flag){
 		// Create a user
@@ -1953,7 +1900,6 @@ function updateInfo(appUuid){
 	
 	if(document.getElementById('notification_true').checked){
 		var numReg = /^[0-9]*$/;
-		//var numReg = /^(([01]?[0-9])|(2[0-3])):[0-5]?[0-9]$/;
 		if(numReg.test(notification_no_disturbing_start) && numReg.test(notification_no_disturbing_end)){
 			
 			notification_no_disturbing_end = parseInt(notification_no_disturbing_end);
@@ -2105,16 +2051,7 @@ function searchUser(appUuid, queryString){
 							 	' | <a  class="btn btn-mini btn-info" href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a>'+
 								' | <a  class="btn btn-mini btn-info" href="javascript:sendMessgeOne(\''+appUuid+'\',\''+username+'\')">发送消息</a>'+
 								'</td>'+
-								 //'<td class="text-center"><select id="select1" onchange="selectAppUser(this,\''+appUuid+'\',\''+username+'\')">'+
-                 //'<option value="操作">操作</option>'+
-                 //'<option value="appIMList">查看用户好友</option>'+
-								 //'<option value="setUsername">重置密码</option>'+
-								 //'<option value="sendMsg">发送消息</option>'+
-								 //'<option value="deleteUAdmin">撤销管理员</option>'+
-						     //'</td>'+
 					 		'</tr>';
-					 		
-					 		// 20170802 李伟 add
 					 		var selectOptions = '<tr>'+
 								'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+username+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
 								'<td class="text-center">'+user_name_show+'</td>'+
@@ -2291,7 +2228,6 @@ function sendUserImgMessage(){
 		var appUuid = document.getElementById('appUuidMessage').value;
 		var orgName = $.cookie('orgName');
 		var token = $.cookie('access_token');
-		//var messageContent = $('#messegeContent').val();
 		var target = users.split(',');
 		var str = $('#share-secret').val().split(',');
 		var d = {
@@ -2603,33 +2539,31 @@ function getAppChatrooms(appUuid,pageAction){
 				}
 				$('tbody').html('');
 				$(respData.data).each(function(){
-					var groupid = this.groupid;
-					var groupname = this.groupname;
+					var groupid = $.trim(this.groupid);
+					var groupname = $.trim(this.groupname);
 					if(groupname == '' || groupname == null){
 						groupname = '-';
 					}
 					var nums = 0;
 					var admin='';
-						
-						var selectOptions = '<tr>'+
-							'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+groupid+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
-							'<td class="text-center">'+groupid+'</td>'+
-						 	'<td class="text-center">'+ groupname +'</td>'+
-							'<td class="text-center">'+
-								'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
-			    					'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
-				    					'<ul class="dropdown-menu">'+
-						            '<li data-filter-camera-type="all"><a href="javascript:togroupaddAppAdminuserusers(\''+appUuid+'\',\''+groupid+'\')">查看群组成员</a></li>'+
-						            '<li data-filter-camera-type="Alpha"><a href="javascript:deleteAppChatroom(\''+appUuid+'\',\''+groupid+'\')">删除</a></li>'+
-						            '<li data-filter-camera-type="Zed"><a href="javascript:sendMessgeOne(\''+appUuid+'\',\''+groupid+'\')">发送消息</a></li>'+
-					     				'</ul>'+
-					     			'</li>'+
-				     		'</ul>'+
-							'</td>'+
-						'</tr>';
-						
-						$('#tr_loading').remove();
-						$('#appChatroomBody').append(selectOptions);
+					var selectOptions = '<tr>'+
+					'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+groupid+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
+					'<td class="text-center">'+ groupid +'</td>'+
+					'<td class="text-center">'+ groupname +'</td>'+
+					'<td class="text-center">'+
+					'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
+			    		'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
+				    	'<ul class="dropdown-menu">'+
+				        '<li data-filter-camera-type="all"><a href="javascript:togroupaddAppAdminuserusers(\''+appUuid+'\',\''+groupid+'\')">查看群组成员</a></li>'+
+				        '<li data-filter-camera-type="Alpha"><a href="javascript:deleteAppChatroom(\''+appUuid+'\',\''+groupid+'\')">删除</a></li>'+
+				        '<li data-filter-camera-type="Zed"><a href="javascript:sendMessgeOne(\''+appUuid+'\',\''+groupid+'\')">发送消息</a></li>'+
+					'</ul>'+
+					'</li>'+
+				        '</ul>'+
+					'</td>'+
+					'</tr>';
+					$('#tr_loading').remove();
+					$('#appChatroomBody').append(selectOptions);
 				});
 
 				var tbody = document.getElementsByTagName("tbody")[0];
@@ -2641,7 +2575,6 @@ function getAppChatrooms(appUuid,pageAction){
 						$(pageLi[i]).hide();
 					}
 				} else {
-					//updateChatroomPageStatus(appUuid);	
 				}
 			}
 		});
@@ -2714,26 +2647,6 @@ function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
 				
 				var nums = 0;
 				var admin='';
-			  /*$.ajax({  
-					url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +qunzuid+'/users',
-					async: false, 
-					type:'GET',
-					headers:{
-						'Authorization':'Bearer '+access_token,
-						'Content-Type':'application/json'
-					},		
-					error:function(respData){
-				
-					},
-					success:function(respData){
-						
-						nums = respData.data.length;
-						$(respData.data).each(function(){
-              admin = this.owner
-					});
-					} 
-				    
-				});*/
 				if(errors!=null){
                    var option = '<tr><td class="text-center" colspan="3">无数据!</td></tr>';
 					$('#appChatroomBody').append(option);
@@ -2758,20 +2671,6 @@ function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
 				$('#tr_loading').remove();		
 				$('#appChatroomBody').append(selectOptions);
 				}
-				
-				
-				//var tbody = document.getElementsByTagName("tbody")[0];
-
-				/*if(!tbody.hasChildNodes()){
-					var option = '<tr><td class="text-center" colspan="3">无数据!</td></tr>';
-					$('#appChatroomBody').append(option);
-					var pageLi = $('#pagina').find('li');
-					for(var i=0;i<pageLi.length;i++){
-						$(pageLi[i]).hide();
-					}
-				} else {
-					updateChatroomPageStatus(appUuid);	
-				}*/
 			}
 		});
 	}
@@ -2907,7 +2806,6 @@ function deleteAppChatroomUsers(appUuid,groupuuid,usersname){
 	var orgName = $.cookie('orgName');
 	
 	if(confirm('确定要把该成员移除此群组吗?')){
-		//alert(baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +groupuuid+'/users/'+usersname);
 		$.ajax({
 			url:baseUrl + '/' +orgName +'/'+appUuid+'/chatgroups/' +groupuuid+'/users/'+usersname,
 			type:'DELETE',
@@ -3094,7 +2992,6 @@ function updatequnzuPageStatus(){
 			success: function(respData, textStatus, jqXHR) {
 				total = respData.entities.length;
 				var totalPage = (total % 5 == 0) ? (parseInt(total / 5)) : (parseInt(total / 5) + 1);
-				// $('#pageInfo').text('当前第' + pageNo +  '页     一共' + totalPage +'页');
 				var ulB = '<ul>';
 				var ulE = '</ul>';
 				var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
@@ -3103,30 +3000,20 @@ function updatequnzuPageStatus(){
 				// 首页
 				if(pageNo == 1){
 					if(totalPage == 1){
-						//$(pageLi[0]).hide();
-						//$(pageLi[1]).hide();
 						$('#paginau').append(ulB + ulE);
 					} else {
 						$('#paginau').append(ulB + textOp2 + ulE);
-						//$(pageLi[0]).hide();
-						//$(pageLi[1]).show();
 					}
 					// 尾页
 				} else if(totalPage ==  pageNo){
 					$('#paginau').append(ulB + textOp1 + ulE);
-					//$(pageLi[0]).show();
-					//$(pageLi[1]).hide();
 				} else {
 					$('#paginau').append(ulB + textOp1 + textOp2 + ulE);
-					//$(pageLi[0]).show();
-					//$(pageLi[1]).show();
 				}
 			}
 		});
 	}
 }
-
-
 
 // 查询证书信息
 function getAppCredentials(appUuid, pageAction){
@@ -3156,8 +3043,6 @@ function getAppCredentials(appUuid, pageAction){
 				
 			},
 			success: function(respData, textStatus, jqXHR) {
-				//$('#appCredentialBody').html('');
-				// 缓存游标,下次next时候存新的游标
 				if(pageAction!='forward'){
 					cursors[pageNo+1] =	respData.cursor;
 				} else {
@@ -3210,7 +3095,6 @@ function getAppCredentials(appUuid, pageAction){
 							'</tr>';
 							
 					});
-					//$('#tr_loading').remove();
 					$('#appCredentialBody').html('');
 					$('#appCredentialBody').append(option);
 				}
@@ -3249,7 +3133,7 @@ function getAppCredentials(appUuid, pageAction){
 				$('#fileAppKey').text(respData.applicationName);
 				
 				if(respData.entities.length == 0){
-					var option = '<tr><td class="text-center" colspan="5">暂无证书!</td></tr>';
+					var option = '<tr><td class="text-center" colspan="6">暂无证书!</td></tr>';
 					$('#appCredentialBody').append(option);
 				}
 			}
@@ -3341,11 +3225,6 @@ function getAppIMList(appUuid, owner_username){
 				var i=0;
 				var selectOptions = '';
 				$(respData.data).each(function(){
-					/*var option = '<tr>'+
-								'<td style=" visibility:visible;"><input type="checkbox" value="fff"  style="width:100px; height:20px;border:1px solid #F00;"/>'+(i+1)+'</td>'+
-							 	'<td>'+respData.data[i]+'</td>'+
-							 	'<td style="padding:4px 0 0 0;"><a class="a_button" href="javascript:deleteAppIMFriend(\''+appUuid+'\', \''+owner_username+'\',\''+respData.data[i]+'\')"  style="display:block; background:#fafafa; border:1px solid #e0e8eb; width:100px; height:25px; line-height:25px; font-size:12px;">解除好友关系</a></td>'+
-					 		'</tr>';*/
 					selectOptions += '<tr>'+
 							'<td style=" visibility:visible;"><input type="checkbox" value="fff"  style="width:100px; height:20px;border:1px solid #F00;"/>'+(i+1)+'</td>'+
 							'<td>'+respData.data[i]+'</td>'+
@@ -3516,13 +3395,6 @@ function getAppUsersAdminList(appUuid, pageAction){
 					$(respData.entities).each(function(){
 						var username = this.username;
 						var created = format(this.created);
-						/*var option = '<tr>'+
-									'<td class="text-center">'+(i+1)+'</td>'+	
-									'<td class="text-center">'+username+'</td>'+
-									'<td class="text-center">'+created+'</td>'+
-									'<td class="text-center">'+
-									'<a  class="btn btn-mini btn-info" href="javascript:deleteUserAdmin(\''+appUuid+'\',\''+username+'\')">撤销管理员</a></td>'+
-								'</tr>';*/
 						selectOptions += '<tr>'+
 								'<td class="text-center">'+(i+1)+'</td>'+	
 								'<td class="text-center">'+username+'</td>'+
@@ -3554,7 +3426,6 @@ function getAppUsersAdminList(appUuid, pageAction){
 						$(pageLi[i]).hide();
 					}
 				} else {
-					// 20140810 liwei add
 					var ulB = '<ul>';
 					var ulE = '</ul>';
 					var textOp1 = '<li> <a href="javascript:void(0);" onclick="getPrevAppUserList();">上一页</a> </li>';
@@ -3595,7 +3466,6 @@ function setUserAdmin(appUuid,user_name){
 			'Content-Type':'application/json'
 		},
 		success:function(respData){
-			// if success , to app user list
 			alert('设置管理员成功!')
 			getAppUserList(appUuid,'no');
 		},
@@ -3622,7 +3492,6 @@ function deleteUserAdmin(appUuid,user_name){
 				'Content-Type':'application/json'
 			},
 			success:function(respData){
-				// if success , to app user list
 				alert('撤销管理员成功!')
 				if(str == 'app_users_admin'){
 					getAppUsersAdminList(appUuid,'no');
@@ -3655,7 +3524,6 @@ function deleteUserAdminForSearch(appUuid,user_name){
 				'Content-Type':'application/json'
 			},
 			success:function(respData){
-				// if success , to app user list
 				alert('撤销管理员成功!')
 				searchUser(appUuid, user_name);		
 			},
@@ -3668,7 +3536,6 @@ function deleteUserAdminForSearch(appUuid,user_name){
 }
 //设置管理员For搜索页面
 function setUserAdminForSearch(appUuid,user_name){
-	//获取token
 	var token = $.cookie('access_token');
 	var orgName = $.cookie('orgName');
 	$.ajax({
@@ -3680,7 +3547,6 @@ function setUserAdminForSearch(appUuid,user_name){
 			'Content-Type':'application/json'
 		},
 		success:function(respData){
-			// if success , to app user list
 			alert('设置管理员成功!')
 			searchUser(appUuid, user_name);
 		},
