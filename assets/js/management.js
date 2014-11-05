@@ -2036,8 +2036,6 @@ function searchUser(appUuid, queryString){
 					var userAdmin = '';
 					var excute = '';
 					var user_name_show = username;
-					
-					
 					var option = '<tr>'+
 								'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+username+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
 								'<td class="text-center">'+user_name_show+'</td>'+																'<td class="text-center">'+notification_display_style+'</td>'+
@@ -2048,6 +2046,7 @@ function searchUser(appUuid, queryString){
 							 	'<td class="text-center">'+created+'</td>'+
 							 	'<td class="text-center"><a href="javascript:toAppIMList(\''+username+'\')" class="btn btn-mini btn-info">查看用户好友</a>'+
 							 	' | <a href="#passwordMondify" id="passwdMod${status.index }" onclick="setUsername(\'' + appUuid + '\',\''+ username +'\');" data-toggle="modal" role="button" class="btn btn-mini btn-info">重置密码</a>'+
+								'<li data-filter-camera-type="Zed"><a href="javascript:showUpdateInfo(\''+appUuid+'\',\''+username+'\')">修改信息</a></li>'+
 							 	' | <a  class="btn btn-mini btn-info" href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a>'+
 								' | <a  class="btn btn-mini btn-info" href="javascript:sendMessgeOne(\''+appUuid+'\',\''+username+'\')">发送消息</a>'+
 								'</td>'+
@@ -2067,6 +2066,7 @@ function searchUser(appUuid, queryString){
 				    					'<ul class="dropdown-menu">'+
 					          		'<li data-filter-camera-type="all"><a href="javascript:toAppIMList(\''+username+'\')">查看用户好友</a></li>'+
 							          '<li data-filter-camera-type="Alpha"><a href="#passwordMondify" id="passwdMod${status.index }" onclick="setUsername(\'' + appUuid + '\',\''+ username +'\');" data-toggle="modal" role="button">重置密码</a></li>'+
+								'<li data-filter-camera-type="Zed"><a href="javascript:showUpdateInfo(\''+appUuid+'\',\''+username+'\')">修改信息</a></li>'+
 							          '<li data-filter-camera-type="Zed"><a href="javascript:deleteAppUser(\''+appUuid+'\',\''+username+'\')">删除</a></li>'+
 							          '<li data-filter-camera-type="Zed"><a href="javascript:sendMessgeOne(\''+appUuid+'\',\''+username+'\')">发送消息</a></li>'+
 							          
