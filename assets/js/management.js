@@ -2548,8 +2548,8 @@ function getAppChatrooms(appUuid,pageAction){
 					var admin='';
 					var selectOptions = '<tr>'+
 					'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+groupid+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
-					'<td class="text-center">'+ groupid +'</td>'+
-					'<td class="text-center">'+ groupname +'</td>'+
+					'<td class="text-center" width="222px" style="word-break:break-all">'+ groupid +'</td>'+
+					'<td class="text-center" width="666px" style="word-break:break-all">'+ groupname +'</td>'+
 					'<td class="text-center">'+
 					'<ul class="text-center" class="nav-pills" style="list-style-type:none">'+
 			    		'<li class="dropdown all-camera-dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">操作<b class="caret"></b></a>'+
@@ -2625,7 +2625,6 @@ function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
 				'Content-Type':'application/json'
 			},		
 			error:function(respData){
-				alert("请输入群id查询");
 			},
 			success:function(respData){
 				// 缓存游标,下次next时候存新的游标
@@ -2639,7 +2638,7 @@ function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
 				var groupname = respData.data[0].name;
 				var errors=respData.data[0].error;
 				if(errors!=null){
-                  alert("该群id不存在，请重新输入");
+                  			alert("该群id不存在，请重新输入");
 				}
 				if(groupname == '' || groupname == null){
 					groupname = '-';
@@ -2648,10 +2647,10 @@ function getqunzuAppChatrooms(appUuid,qunzuid,pageAction){
 				var nums = 0;
 				var admin='';
 				if(errors!=null){
-                   var option = '<tr><td class="text-center" colspan="3">无数据!</td></tr>';
+                   			var option = '<tr><td class="text-center" colspan="3">无数据!</td></tr>';
 					$('#appChatroomBody').append(option);
 				}else{
-                  var selectOptions = '<tr>'+
+                  			var selectOptions = '<tr>'+
 							'<td class="text-center"><label><input style="opacity:1;" name="checkbox" type="checkbox" value="'+groupid+'" />&nbsp;&nbsp;&nbsp;</label></td>'+	
 							'<td class="text-center">'+groupid+'</td>'+
 						 	'<td class="text-center">'+ groupname +'</td>'+
@@ -2710,10 +2709,8 @@ function getAppChatroomsuser(appUuid,groupid,pageAction){
 				'Content-Type':'application/json'
 			},		
 			error:function(respData){
-				
 			},
 			success:function(respData){
-				// 缓存游标,下次next时候存新的游标
 				if(pageAction!='forward'){
 					cursors[pageNo+1] = respData.cursor;
 				} else {
@@ -2724,9 +2721,7 @@ function getAppChatroomsuser(appUuid,groupid,pageAction){
 				}else{
 					$('#showName').text(respData.applicationName);
 					$('#showUsername').text(cuser)
-						
 					$('tbody').html('');
-					//var i=0;
 					$(respData.data).each(function(){
 						
 						var members = this.member;
@@ -2954,7 +2949,7 @@ function deleteAppqunzuCheckBox(appUuid){
 			}
 		}
 		if(num>0){
-			if(confirm('确定要删除这些q群组吗?')){
+			if(confirm('确定要删除这些群组吗?')){
 				for (var i=0;i<checkbox.length;i++){
 					if(checkbox[i].checked){
 						deleteAppChatrooms(appUuid,checkbox[i].value);
@@ -2963,7 +2958,7 @@ function deleteAppqunzuCheckBox(appUuid){
 				location.replace(location.href);
 			}
 		}else{
-			alert('至少选择一个用户!');	
+			alert('至少选择一个群组!');	
 		}
 }
 //============================================================证书 ========================================================================
